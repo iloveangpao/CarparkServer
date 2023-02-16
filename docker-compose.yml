@@ -1,0 +1,30 @@
+services:
+  api-server:
+    image: fastimage
+    ports:
+      - "80:8000"
+    depends_on:
+      - database
+
+  database:
+    image: mysql
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    environment:
+      MYSQL_DATABASE: 'carpakdb'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'password'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'password'
+    volumes:
+      - './my-db:/var/lib/mysql'
+
+  
+networks:
+  default:
+    name: carpaknet
+
