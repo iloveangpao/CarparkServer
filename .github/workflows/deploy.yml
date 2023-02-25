@@ -44,5 +44,5 @@ jobs:
         with:
           push: true # Will only build if this is not here
           tags: |
-            ghcr.io/carparkserver:${{ github.sha }}
-            ghcr.io/carparkserver:latest
+            ghcr.io/iloveangpao/carparkserver:${{ github.sha }}
+            ghcr.io/iloveangpao/carparkserver:latest
