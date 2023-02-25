@@ -1,6 +1,6 @@
 # Build and Deploy to azure :))))))))
 
-name: deploy to development
+name: deploy
 
 # Controls when the workflow will run
 on:
@@ -44,5 +44,5 @@ jobs:
         with:
           push: true # Will only build if this is not here
           tags: |
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/carparkserver:${{ github.sha }}
+            ghcr.io/carparkserver:latest
