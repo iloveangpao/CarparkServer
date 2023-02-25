@@ -52,16 +52,15 @@ jobs:
     needs: build-image
 
     steps:
-      - name: Login via Azure CLI
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      - name: setup docker context
+      - name: Deploy and run docker images
+        env:
+          PRIVATE_KEY: ${{ secrets.VM_PRIVATE_KEY  }}
+          HOSTNAME: ${{ secrets.VM_HOSTNAME  }}
+          USER_NAME: ${{ secrets.VM_USERNAME  }}
         run: |
-          docker context create aci --resource-group carpakData
-          docker compose up -d
-      
-      - name: Azure logout
-        run: |
-          az logout
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+            cd /home/${USER_NAME}/carpak &&
+            wget -q https://raw.githubusercontent.com/iloveangpao/CarparkServer/main/docker-compose.yml -O docker-compose.yml &&
+            docker compose pull &&
+            docker compose up -d
