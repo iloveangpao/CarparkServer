@@ -1,3 +1,6 @@
+# yaml-language-server: $schema=<urlToTheSchema>
+
+
 # Build and Deploy to azure :))))))))
 
 name: deploy
@@ -60,7 +63,7 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-            cd /home/${USER_NAME}/carpak &&
+            cd /home/iloveangpao/carpak &&
             wget -q https://raw.githubusercontent.com/iloveangpao/CarparkServer/main/docker-compose.yml -O docker-compose.yml &&
             docker compose pull &&
             docker compose up -d
