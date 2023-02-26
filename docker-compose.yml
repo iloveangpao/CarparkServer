@@ -1,6 +1,6 @@
 services:
   api-server:
-    build: .
+    build: ./Dockerfile
     ports:
       - "80:8000"
     depends_on:
