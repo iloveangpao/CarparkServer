@@ -67,3 +67,5 @@ jobs:
             wget -q https://raw.githubusercontent.com/iloveangpao/CarparkServer/main/docker-compose.yml -O docker-compose.yml &&
             docker compose pull &&
             docker compose up -d
+
+            
