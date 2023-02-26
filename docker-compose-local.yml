@@ -1,6 +1,6 @@
 services:
   api-server:
-    image: "ghcr.io/iloveangpao/carparkserver:latest"
+    build: .
     ports:
       - "80:8000"
     depends_on:
@@ -27,4 +27,3 @@ services:
 networks:
   default:
     name: carpaknet
-
