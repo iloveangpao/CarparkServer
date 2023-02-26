@@ -62,7 +62,7 @@ jobs:
           USER_NAME: ${{ secrets.VM_USERNAME  }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME}
+          ssh -i private_key ${USER_NAME}@${HOSTNAME}
             pwd
             # cd carpak &&
             # wget -q https://raw.githubusercontent.com/iloveangpao/CarparkServer/main/docker-compose.yml -O docker-compose.yml &&
