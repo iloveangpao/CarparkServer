@@ -5,15 +5,25 @@ import json
 
 class URA:
     def __init__(self, getType):
-        self.getData()
+        # self.getData()
         self.token = self.getToken()
         self.subject = getType
         print('hello')
 
     def getToken(self):
-        r = requests.get(self.tokenURL, 
-        headers={'AccessKey':self.accessKey},allow_redirects=False)
-        print(r.status_code,r.json())
+        # print(f"using access token: {self.accessKey}")
+        # r = requests.get(self.tokenURL, 
+        # headers={'AccessKey':self.accessKey})
+        headers = {
+            'AccessKey': 'fbc23f75-0023-47f7-a2e7-c22f489cdc75'
+        }
+        
+        r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
+                         headers=headers, data={}
+                         )
+        print(r.status_code)
+        print(r.text)
+        print(r.json())
 
     def getData(self):
         Config = configparser.ConfigParser()
