@@ -5,9 +5,9 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-@app.get("/")
+@app.get("/carparkInfo/{requirement}")
 
-def read_root():
+def carpark():
     return {"Hello" : "World"}
 
 @app.get("/items/{item_id}")
