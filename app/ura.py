@@ -15,7 +15,8 @@ class URA:
         # r = requests.get(self.tokenURL, 
         # headers={'AccessKey':self.accessKey})
         headers = {
-            'AccessKey': 'fbc23f75-0023-47f7-a2e7-c22f489cdc75'
+            'AccessKey': 'fbc23f75-0023-47f7-a2e7-c22f489cdc75',
+            'User-Agent': 'curl/7.37.1'
         }
         
         r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
