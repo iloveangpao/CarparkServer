@@ -7,7 +7,7 @@ services:
       - database
 
   database:
-    image: mysql
+    image: mysql:latest
     ports:
       - "3306:3306"
     expose:

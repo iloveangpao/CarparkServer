@@ -1,4 +1,5 @@
 import requests
+from parsers import config
 import os
 import configparser
 import json
@@ -6,36 +7,57 @@ import json
 class URA:
     def __init__(self, getType):
         # self.getData()
+        self.accessKey = config().getData('URA','AccessKey')
         self.token = self.getToken()
         self.subject = getType
-        print('hello')
+        # print('hello')
 
     def getToken(self):
-        # print(f"using access token: {self.accessKey}")
-        # r = requests.get(self.tokenURL, 
-        # headers={'AccessKey':self.accessKey})
         headers = {
-            'AccessKey': 'fbc23f75-0023-47f7-a2e7-c22f489cdc75',
+            'AccessKey': self.accessKey,
             'User-Agent': 'curl/7.37.1'
         }
         
         r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
                          headers=headers, data={}
                          )
-        print(r.status_code)
-        print(r.text)
-        print(r.json())
-
-    def getData(self):
-        Config = configparser.ConfigParser()
-        Config.read('./app/config.ini')
-        self.accessKey = Config.get('URA',  'AccessKey')
+        # print(r.json())
+        print(r.json()['Result'])
+        # print(self.__class__.__name__)
+        return r.json()['Result']
+    
+    def getCarparks(self):
+        headers = {
+            'AccessKey': self.accessKey,
+            'User-Agent': 'curl/7.37.1',
+            'Token': self.token
+        }
         
-        self.tokenURL = Config.get('URA', 'TokenURL')
-        print(self.accessKey,self.tokenURL)
+        r = requests.get("https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Details",
+                         headers=headers, data={}
+                         )
+        # print(r.json()['Result'])
+        return r.json()['Result']
+    
+    def getAvail(self):
+        headers = {
+            'AccessKey': self.accessKey,
+            'User-Agent': 'curl/7.37.1',
+            'Token': self.token
+        }
+        
+        r = requests.get("https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Availability",
+                         headers=headers, data={}
+                         )
+        # print(r.json()['Result'])
+        return r.json()['Result']
+
+
+
+
 
 
 ura = URA(1)
-ura.getToken()
+ura.getCarparks()
 
 
