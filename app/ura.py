@@ -1,11 +1,11 @@
 import requests
-from parsers import config
+from app.parsers import config
 import os
 import configparser
 import json
 
 class URA:
-    def __init__(self, getType):
+    def __init__(self, getType = None):
         # self.getData()
         self.accessKey = config().getData('URA','AccessKey')
         self.token = self.getToken()

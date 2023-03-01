@@ -2,6 +2,8 @@ from typing import Union
 
 from fastapi import FastAPI
 
+from app.ura import URA
+
 app = FastAPI()
 
 @app.get("/")
@@ -10,8 +12,11 @@ async def root():
 
 @app.get("/carparkInfo/{requirement}")
 
-def carpark():
-    return {"Hello" : "World"}
+async def carpark(requirement):
+    uraGetter = URA()
+    getter = getattr(uraGetter, requirement)
+    result = getter()
+    return {requirement : result}
 
 @app.get("/items/{item_id}")
 
