@@ -1,10 +1,10 @@
 from typing import Union
 from fastapi import FastAPI, Depends
 
-##class for accessing URA api
+#class for accessing URA api
 from app.ura import URA
 
-# ## db stuff
+## db stuff
 # import db.schemas.carparkSchema as carparkSchema
 # from db.database import SessionLocal, engine
 # import db.model as model
@@ -28,18 +28,18 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/carparkInfo/{requirement}")
+# @app.get("/carparkInfo/{requirement}")
 
-async def carpark(requirement):
-    uraGetter = URA()
-    getter = getattr(uraGetter, requirement)
-    result = getter()
-    return {requirement : result}
+# async def carpark(requirement):
+#     uraGetter = URA()
+#     getter = getattr(uraGetter, requirement)
+#     result = getter()
+#     return {requirement : result}
 
-@app.get("/items/{item_id}")
+# @app.get("/items/{item_id}")
 
-def read_item(item_id : int , q: Union[str,None] = None):
-    return {"item_id": item_id, "q": q}
+# def read_item(item_id : int , q: Union[str,None] = None):
+#     return {"item_id": item_id, "q": q}
 
 # @app.get("/carparkInfo")
 # async def read_movies(db: Session = Depends(get_database_session)):

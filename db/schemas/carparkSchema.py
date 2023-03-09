@@ -13,12 +13,12 @@ class Rate (BaseModel):
 
 class location (BaseModel):
     num: int = None
-    locations = tuple = None
+    locations: tuple = None
 
 class Carpark(BaseModel):
     id = int
     name = str
-    location = location
+    locations = location
     Rates = Rate
 
     class Config:
