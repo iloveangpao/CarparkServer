@@ -6,11 +6,9 @@ import json
 
 class URA:
     def __init__(self, getType = None):
-        # self.getData()
         self.accessKey = config().getData('URA','AccessKey')
         self.token = self.getToken()
         self.subject = getType
-        # print('hello')
 
     def getToken(self):
         headers = {
@@ -22,8 +20,9 @@ class URA:
                          headers=headers, data={}
                          )
         # print(r.json())
+        result = r.json()['Result']
         print(r.json()['Result'])
-        # print(self.__class__.__name__)
+        config().throwData('URA','AccessToken',result)
         return r.json()['Result']
     
     def getCarparks(self):
@@ -36,7 +35,6 @@ class URA:
         r = requests.get("https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Details",
                          headers=headers, data={}
                          )
-        # print(r.json()['Result'])
         return r.json()['Result']
     
     def getAvail(self):
@@ -49,7 +47,6 @@ class URA:
         r = requests.get("https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Availability",
                          headers=headers, data={}
                          )
-        # print(r.json()['Result'])
         return r.json()['Result']
 
 

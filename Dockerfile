@@ -10,4 +10,4 @@ RUN poetry install --without dev
 # Creating folders, and files for a project:
 COPY ./app /code/app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
