@@ -4,19 +4,19 @@ from fastapi import FastAPI, Depends
 ##class for accessing URA api
 from app.ura import URA
 
-## db stuff
-import db.schemas.carparkSchema as carparkSchema
-from db.database import SessionLocal, engine
-import db.model as model
-from sqlalchemy.orm import Session
-model.Base.metadata.create_all(bind=engine)
+# ## db stuff
+# import db.schemas.carparkSchema as carparkSchema
+# from db.database import SessionLocal, engine
+# import db.model as model
+# from sqlalchemy.orm import Session
+# model.Base.metadata.create_all(bind=engine)
 
-def get_database_session():
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
+# def get_database_session():
+#     try:
+#         db = SessionLocal()
+#         yield db
+#     finally:
+#         db.close()
 
 
 
@@ -41,10 +41,10 @@ async def carpark(requirement):
 def read_item(item_id : int , q: Union[str,None] = None):
     return {"item_id": item_id, "q": q}
 
-@app.get("/carparkInfo")
-async def read_movies(db: Session = Depends(get_database_session)):
-    records = db.query(Carparks).all()
-    return records
+# @app.get("/carparkInfo")
+# async def read_movies(db: Session = Depends(get_database_session)):
+#     records = db.query(Carparks).all()
+#     return records
 
 
 
