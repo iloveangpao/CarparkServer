@@ -8,6 +8,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --without dev
 
 # Creating folders, and files for a project:
-COPY ./app /code/app
+# COPY ./app /code/app
+COPY . /code/
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
