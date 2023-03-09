@@ -49,24 +49,24 @@ async def read_movies(db: Session = Depends(get_database_session)):
 
 
 
-###daily scheduler
-from rocketry import Rocketry
-from rocketry.conds import every, after_success
+# ###daily scheduler
+# from rocketry import Rocketry
+# from rocketry.conds import every, after_success
 
-# Creating the Rocketry app
-app = Rocketry(config={"task_execution": "async"})
+# # Creating the Rocketry app
+# app = Rocketry(config={"task_execution": "async"})
 
-# Creating some tasks
-@app.task('daily')
-async def getURAToken():
-    uraGetter = URA()
-    getter = uraGetter.getToken
-    result = getter()
-    return {result}
+# # Creating some tasks
+# @app.task('daily')
+# async def getURAToken():
+#     uraGetter = URA()
+#     getter = uraGetter.getToken
+#     result = getter()
+#     return {result}
 
-@app.task(after_success(getURAToken))
-async def getCarparks():
-    uraGetter = URA()
-    getter = uraGetter.getCarparks
-    result = getter()
-    return result
+# @app.task(after_success(getURAToken))
+# async def getCarparks():
+#     uraGetter = URA()
+#     getter = uraGetter.getCarparks
+#     result = getter()
+#     return result
