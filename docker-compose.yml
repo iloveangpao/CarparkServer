@@ -2,7 +2,7 @@ services:
   api-server:
     image: "ghcr.io/iloveangpao/carparkserver:latest"
     ports:
-      - "80:8000"
+      - "8000:8000"
     depends_on:
       - database
 
