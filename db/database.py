@@ -5,7 +5,7 @@ from urllib import parse
 
 ## specify database configs
 config = {
-    'host' : '0.0.0.0',
+    'host' : 'host',
     'port' : 3306,
     'user' : 'root',
     'password' : 'password',

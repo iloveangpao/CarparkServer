@@ -7,7 +7,7 @@ services:
       - database
 
   database:
-    # hostname: 'host'
+    hostname: 'host'
     image: mysql:latest
     ports:
       - "3306:3306"
