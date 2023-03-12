@@ -12,5 +12,5 @@ COPY ./app /code/app
 COPY ./db /code/db
 
 # CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
+RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./docker-entrypoint.sh"]
