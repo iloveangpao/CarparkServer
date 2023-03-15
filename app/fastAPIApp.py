@@ -13,7 +13,7 @@ class Unbuffered(object):
 import sys
 sys.stdout = Unbuffered(sys.stdout)
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -139,53 +139,54 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 
 
 #class for accessing URA api
-import sys
-print(sys.path)
-print(os.listdir())
 from app.ura import URA
-
+from db.schemas.carparkSchema import *
+import db.crud as crud
 import os
-print(os.getcwd())
 
+'''will clean this shit up later'''
 # db stuff
+# @app.get("/carparks", response_model=Carpark)
+# async def create_carpark(db: Session = Depends(get_database_session), carparkData: json = None):
+#     ura = URA(1)
+#     carparks = ura.getCarparks()
+
+#     # for cp in carparks:
+#     #     for item in cp.items():
+#     #         print(item)
+#     #     print()
+#     cp = carparks[0]    
+#     r = Rate(
+#         weekdayMin=cp['weekdayMin'],
+#         endTime=cp['endTime'],
+#         weekdayRate=cp['weekdayRate'],
+#         startTime=cp['startTime'],
+#         sunPHRate=cp['sunPHRate'],
+#         sunPHMin=cp['sunPHMin'],
+#         satdayRate=cp['satdayRate'],
+#         satdayMin=cp['satdayMin']
+#     )
+#     l = Location(
+#         num=len(cp['geometries']),
+#         locations=[tuple(map(float, loc.split(','))) for loc in cp['geometries']]
+#     )
+#     carpark = Carpark(id=cp['ppCode'], name=cp['ppName'], locations=l, Rates=r)
+#     db.add(carpark)
+#     db.commit()
+    
+#     print("added carpark")
+#     return db.query(Carpark).offset(0).limit(100).all()
+
+'''this is the impt stuff for rn'''
+@app.post("/carpark/", response_model=Carpark)
+def create_carpark(carpark: CarparkCreate, db: Session = Depends(get_database_session)):
+    return crud.create_user(db=db, carpark=carpark)
 
 
-def create_carpark(db: Session = Depends(get_database_session), carparkData : json = None):
-    carpark = model.Carparks(
-        id = carparkData["ppCode"],
-        name = carparkData["ppName"],
-        locations = carparkData[""]
-    )
-    db.add(carpark)
-    db.commit()
-
-###making endpoint
-
-# @app.get("/carparkInfo/{requirement}")
-
-# async def carpark(requirement):
-#     uraGetter = URA()
-#     getter = getattr(uraGetter, requirement)
-#     result = getter()
-#     return {requirement : result}
-
-# @app.get("/items/{item_id}")
-
-# def read_item(item_id : int , q: Union[str,None] = None):
-#     return {"item_id": item_id, "q": q}
-
-@app.get("/carparkInfo")
-async def read_movies(db: Session = Depends(get_database_session)):
-    carparkData = URA.getCarparks()
-    carpark = model.Carparks(
-        id = carparkData["ppCode"],
-        name = carparkData["ppName"],
-        locations = carparkData[""]
-    )
-    db.add(carpark)
-    db.commit()
-    records = db.query(Carparks).all()
-    return records
+@app.get("/carpark/", response_model=list[Carpark])
+def read_carparks(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    carparks = crud.get_carparks(db, skip=skip, limit=limit)
+    return carparks
 
 
 
@@ -228,15 +229,6 @@ async def get_tasks():
         )
         for task in session.tasks
     ]
-
-# @app.post("/my-route")
-# async def manipulate_session():
-#     for task in session.tasks:
-#         ...
-
-
-
-
 
 
 if __name__ == "__main__":
