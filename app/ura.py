@@ -19,7 +19,7 @@ class URA:
         r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
                          headers=headers, data={}
                          )
-        # print(r.json())
+        print(r.json())
         result = r.json()['Result']
         print(r.json()['Result'])
         config().throwData('URA','AccessToken',result)
@@ -48,13 +48,3 @@ class URA:
                          headers=headers, data={}
                          )
         return r.json()['Result']
-
-
-
-
-
-
-ura = URA(1)
-ura.getCarparks()
-
-

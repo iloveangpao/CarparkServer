@@ -1,25 +1,38 @@
 from datetime import time
 from pydantic import BaseModel
 
-class Rate (BaseModel):
-    weekdayMin: str = None
-    endTime: time = None
-    weekdayRate: float = None
-    startTime: time = None
-    sunPHRate: float = None
-    sunPHMin: str = None
-    satdayRate: float = None
-    satdayMin: str = None
+class Rate(BaseModel):
+    weekdayMin: str
+    endTime: str #time
+    weekdayRate: str #float
+    startTime: str #time
+    sunPHRate: str #float
+    sunPHMin: str
+    satdayRate: str #float
+    satdayMin: str
 
-class location (BaseModel):
+
+class Location(BaseModel):
     num: int = None
-    locations: tuple = None
+    locations: list[tuple] = None
 
-class Carpark(BaseModel):
-    id = int
-    name = str
-    locations = location
-    Rates = Rate
+
+class CarparkBase(BaseModel):
+    id: int
+    name: str
+    locations: Location
+    rates: Rate
+
+
+class CarparkCreate(CarparkBase):
+    pass
+
+
+class Carpark(CarparkBase):
+    id: int
+    name: str
+    locations: Location
+    Rates: Rate
 
     class Config:
         orm_mode = True
