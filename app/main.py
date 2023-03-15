@@ -13,7 +13,7 @@ class Unbuffered(object):
 import sys
 sys.stdout = Unbuffered(sys.stdout)
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -23,7 +23,11 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hellop World"}
+
+@app.get("/asdf")
+async def new():
+    return {"new": "here"}
 
 from datetime import datetime, timedelta
 from db.schemas.userSchema import *
@@ -31,11 +35,12 @@ from db.database import SessionLocal, engine
 import db.model as model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+
 model.Base.metadata.create_all(bind=engine)
 
 def get_database_session():
+    db = SessionLocal()
     try:
-        db = SessionLocal()
         yield db
     finally:
         db.close()
@@ -138,17 +143,59 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 
 #class for accessing URA api
 from app.ura import URA
+from db.schemas.carparkSchema import *
+import db.crud as crud
 
 import os
 print(os.getcwd())
 
+
+'''will clean this shit up later'''
 # db stuff
+# @app.get("/carparks", response_model=Carpark)
+# async def create_carpark(db: Session = Depends(get_database_session), carparkData: json = None):
+#     ura = URA(1)
+#     carparks = ura.getCarparks()
+
+#     # for cp in carparks:
+#     #     for item in cp.items():
+#     #         print(item)
+#     #     print()
+#     cp = carparks[0]    
+#     r = Rate(
+#         weekdayMin=cp['weekdayMin'],
+#         endTime=cp['endTime'],
+#         weekdayRate=cp['weekdayRate'],
+#         startTime=cp['startTime'],
+#         sunPHRate=cp['sunPHRate'],
+#         sunPHMin=cp['sunPHMin'],
+#         satdayRate=cp['satdayRate'],
+#         satdayMin=cp['satdayMin']
+#     )
+#     l = Location(
+#         num=len(cp['geometries']),
+#         locations=[tuple(map(float, loc.split(','))) for loc in cp['geometries']]
+#     )
+#     carpark = Carpark(id=cp['ppCode'], name=cp['ppName'], locations=l, Rates=r)
+#     db.add(carpark)
+#     db.commit()
+    
+#     print("added carpark")
+#     return db.query(Carpark).offset(0).limit(100).all()
+
+'''this is the impt stuff for rn'''
+@app.post("/carpark/", response_model=Carpark)
+def create_carpark(carpark: CarparkCreate, db: Session = Depends(get_database_session)):
+    return crud.create_user(db=db, carpark=carpark)
 
 
-def create_carpark(db: Session = Depends(get_database_session), carparkData : json = None):
-    carpark = model.Carparks()
-    db.add(carpark)
-    db.commit()
+@app.get("/carpark/", response_model=list[Carpark])
+def read_carparks(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    carparks = crud.get_carparks(db, skip=skip, limit=limit)
+    return carparks
+    
+
+
 
 ###making endpoint
 
