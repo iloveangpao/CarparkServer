@@ -6,6 +6,6 @@ until nc -vz host:3306 > /dev/null; do
   done
   >&2 echo "host:3306 is up"
 
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+python ./app/main.py
 
 exit 0
