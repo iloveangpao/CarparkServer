@@ -18,18 +18,20 @@ class Location(BaseModel):
 
 
 class CarparkBase(BaseModel):
-    id: int
+    id: str
     name: str
     locations: Location
-    rates: Rate
+    Rates: Rate
 
 
 class CarparkCreate(CarparkBase):
     pass
 
 
-class Carpark(CarparkBase):
+
+class Carpark(BaseModel):
     id: int
+    cp_code : str
     name: str
     locations: Location
     Rates: Rate
