@@ -23,9 +23,12 @@ def get_carparks_basic_info(db: Session):
 
 def create_carpark(db: Session, carpark: Carpark):
     print(carpark.locations)
-    db_carpark = Carparks(name=carpark.name, cp_code = carpark.cp_code,
+    try:
+        db_carpark = Carparks(name=carpark.name, cp_code = carpark.cp_code,
                                 locations=carpark.locations.dict(), Rates=carpark.Rates.dict())
-    db.add(db_carpark)
-    db.commit()
-    db.refresh(db_carpark)
-    return db_carpark
+        db.add(db_carpark)
+        db.commit()
+        db.refresh(db_carpark)
+    except Exception as e:
+        print(e)
+    

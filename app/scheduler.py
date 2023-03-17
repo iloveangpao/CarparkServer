@@ -15,8 +15,8 @@ app = Rocketry(execution="async")
 
 from app.ura import URA
 
-from db.crud import *
-from db.schemas.userSchema import *
+import db.crud as crud
+from db.schemas.carparkSchema import *
 from db.database import SessionLocal, engine
 import db.model as model
 from sqlalchemy.orm import Session
@@ -26,39 +26,59 @@ model.Base.metadata.create_all(bind=engine)
 def get_database_session():
     try:
         db = SessionLocal()
-        yield db
+        return db
     finally:
         db.close()
 
 ##daily 
 # @app.task(daily.at("03:40"))
 @app.task('every 60 seconds')
-async def create_carpark(carpark: CarparkCreate, db: Session = get_database_session()):
+async def create_carpark():
     print('working')
     ura = URA()
-    cp = ura.getCarparks()[0]
+    cp = ura.getCarparks()
+    temp = cp[0]
     r = Rate(
-        weekdayMin=cp['weekdayMin'],
-        endTime=cp['endTime'],
-        weekdayRate=cp['weekdayRate'],
-        startTime=cp['startTime'],
-        sunPHRate=cp['sunPHRate'],
-        sunPHMin=cp['sunPHMin'],
-        satdayRate=cp['satdayRate'],
-        satdayMin=cp['satdayMin']
+        weekdayMin=temp['weekdayMin'],
+        endTime=temp['endTime'],
+        weekdayRate=temp['weekdayRate'],
+        startTime=temp['startTime'],
+        sunPHRate=temp['sunPHRate'],
+        sunPHMin=temp['sunPHMin'],
+        satdayRate=temp['satdayRate'],
+        satdayMin=temp['satdayMin']
     )
+    print('aftrate')
+    
+    print(temp)
+    print(type(temp['geometries']))
+    print(temp['geometries'])
+    num = len(temp['geometries'])
+    print(num)
+    locations = []
+    for loc in temp['geometries']:
+        print(loc)
+        locations.append(tuple(loc['coordinates'].split(',')))
+    print(locations)
     l = Location(
-        num=len(cp['geometries']),
-        locations=[tuple(map(float, loc.split(','))) for loc in cp['geometries']]
+        num = num,
+        locations = locations
     )
-    carpark = Carpark(id=cp['ppCode'], name=cp['ppName'], locations=l, Rates=r)
-    print(carpark)
-    # return create_carpark(db=db, carpark=carpark)
+    print('b4parsing')
+    # print(cp)
+    carpark = Carpark(id=0,cp_code = temp['ppCode'], name=temp['ppName'], locations=l, Rates=r)
+    print('yay',carpark)
+    try:
+        db = get_database_session()
+        crud.create_carpark(db=db, carpark=carpark)
+        db.close()
+    except Exception as e:
+        print(e)
+    print('hehe')
 
-@app.task('every 2 seconds')
-async def do_task():
-    print('test')
-    '''test'''
+# @app.task('every 2 seconds')
+# async def do_task():
+#     await print('test')
 
 if __name__ == "__main__":
     app.run()
