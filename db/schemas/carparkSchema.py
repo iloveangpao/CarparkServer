@@ -17,7 +17,7 @@ class Location(BaseModel):
     locations: list[tuple] = None
 
 
-class CarparkBase(BaseModel):
+'''class CarparkBase(BaseModel):
     id: str
     name: str
     locations: Location
@@ -26,7 +26,7 @@ class CarparkBase(BaseModel):
 
 class CarparkCreate(CarparkBase):
     pass
-
+'''
 
 
 class Carpark(BaseModel):

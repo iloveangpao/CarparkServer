@@ -33,6 +33,8 @@ from db.database import SessionLocal, engine
 import db.model as model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+
+
 model.Base.metadata.create_all(bind=engine)
 
 def get_database_session():
@@ -48,7 +50,30 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-User = User()
+
+@app.post("/users/", response_model=User)
+def create_user(user: UserCreate, db: Session = Depends(get_database_session)):
+    #db_user = crud.get_user_by_email(db, email=user.email)
+    #if db_user:
+    #    raise HTTPException(status_code=400, detail="Email already registered")
+    return crud.create_user(db=db, user=user)
+
+
+@app.get("/users/", response_model=list[User])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    users = crud.get_users(db, skip=skip, limit=limit)
+    return users
+
+
+@app.get("/users/{user_id}", response_model=User)
+def read_user(user_id: int, db: Session = Depends(get_database_session)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
+
+'''User = User()
 
 def fake_hash_password(password: str):
     return "fakehashed" + password
@@ -132,7 +157,7 @@ async def login_for_access_token(db : SessionLocal = Depends(get_database_sessio
 
 @app.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
+    return current_user'''
 
 
 ##End Authentication
@@ -144,40 +169,6 @@ from db.schemas.carparkSchema import *
 import db.crud as crud
 import os, json
 
-'''will clean this shit up later'''
-# db stuff
-# @app.get("/carparks", response_model=Carpark)
-# async def create_carpark(db: Session = Depends(get_database_session), carparkData: json = None):
-#     ura = URA(1)
-#     carparks = ura.getCarparks()
-
-#     # for cp in carparks:
-#     #     for item in cp.items():
-#     #         print(item)
-#     #     print()
-#     cp = carparks[0]    
-#     r = Rate(
-#         weekdayMin=cp['weekdayMin'],
-#         endTime=cp['endTime'],
-#         weekdayRate=cp['weekdayRate'],
-#         startTime=cp['startTime'],
-#         sunPHRate=cp['sunPHRate'],
-#         sunPHMin=cp['sunPHMin'],
-#         satdayRate=cp['satdayRate'],
-#         satdayMin=cp['satdayMin']
-#     )
-#     l = Location(
-#         num=len(cp['geometries']),
-#         locations=[tuple(map(float, loc.split(','))) for loc in cp['geometries']]
-#     )
-#     carpark = Carpark(id=cp['ppCode'], name=cp['ppName'], locations=l, Rates=r)
-#     db.add(carpark)
-#     db.commit()
-    
-#     print("added carpark")
-#     return db.query(Carpark).offset(0).limit(100).all()
-
-'''this is the impt stuff for rn'''
 @app.post("/carpark/", response_model=Carpark)
 def create_carpark(carpark: Carpark, db: Session = Depends(get_database_session)):
     return crud.create_carpark(db=db, carpark=carpark)
