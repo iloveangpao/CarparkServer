@@ -32,7 +32,7 @@ def get_database_session():
 
 ##daily 
 # @app.task(daily.at("03:40"))
-@app.task('every 60 seconds')
+@app.task('daily')
 async def create_carpark():
     print('working')
     ura = URA()
@@ -76,9 +76,40 @@ async def create_carpark():
         print(e)
     print('hehe')
 
-# @app.task('every 2 seconds')
-# async def do_task():
-#     await print('test')
+@app.task("after task 'create_carpark'")
+async def add_all_carparks():
+    print('working')
+    ura = URA()
+    cp = ura.getCarparks()
+    db = get_database_session()
+    db.query(model.Carparks).delete()
+    for carpark in cp:
+        r = Rate(
+            weekdayMin=carpark['weekdayMin'],
+            endTime=carpark['endTime'],
+            weekdayRate=carpark['weekdayRate'],
+            startTime=carpark['startTime'],
+            sunPHRate=carpark['sunPHRate'],
+            sunPHMin=carpark['sunPHMin'],
+            satdayRate=carpark['satdayRate'],
+            satdayMin=carpark['satdayMin']
+        )
+        
+        num = len(carpark['geometries'])
+        locations = []
+        for loc in carpark['geometries']:
+            locations.append(tuple(loc['coordinates'].split(',')))
+        l = Location(
+            num = num,
+            locations = locations
+        )
+        carpark = Carpark(id=0,cp_code = carpark['ppCode'], name=carpark['ppName'], locations=l, Rates=r)
+
+        try:
+            crud.create_carpark(db=db, carpark=carpark)
+            db.close()
+        except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
     app.run()

@@ -25,7 +25,7 @@ def get_carparks_basic_info(db: Session):
 
 
 def create_carpark(db: Session, carpark: Carpark):
-    print(carpark.locations)
+    # print(carpark.locations)
     try:
         db_carpark = model.Carparks(name=carpark.name, cp_code = carpark.cp_code,
                                 locations=carpark.locations.dict(), Rates=carpark.Rates.dict())
