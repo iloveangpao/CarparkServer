@@ -25,6 +25,8 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
+
+
 from datetime import datetime, timedelta
 import os
 print(os.listdir())
@@ -187,7 +189,9 @@ def read_carparks(skip: int = 0, limit: int = 100, db: Session = Depends(get_dat
         carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Rates = i.Rates))
     return carparks
 
-
+@app.get("/avail/")
+async def getAvailCP():
+    return URA().getAvail()
 
 
 # Import the Rocketry app

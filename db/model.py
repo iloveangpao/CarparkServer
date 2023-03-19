@@ -1,6 +1,10 @@
 from sqlalchemy.schema import Column
-from sqlalchemy.types import String, Integer, Text, JSON
+from typing import List
+from sqlalchemy.types import String, Integer, Text, JSON, ARRAY, PickleType
 from sqlalchemy.dialects.mysql import MEDIUMTEXT, VARCHAR
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from db.database import Base
 
@@ -9,9 +13,10 @@ class Carparks(Base):
     id = Column(Integer, primary_key=True, index = True)
     cp_code = Column(Text)
     name = Column(Text)
-    locations = Column(JSON, nullable = True)
-    Rates = Column(JSON, nullable = True)
+    locations = Column(JSON)
+    Rates = Column(JSON)
 
+    BookableSlots = Column(PickleType, nullable = True)
 
 '''class Users(Base):
     __tablename__ = "users"
@@ -29,3 +34,6 @@ class User(Base):
     hashed_password = Column(String)
 
     # bookings = relationship("Item", back_populates="owner")
+
+
+

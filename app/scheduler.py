@@ -81,8 +81,14 @@ async def add_all_carparks():
     print('working')
     ura = URA()
     cp = ura.getCarparks()
+    with open("sample.json", "w") as outfile:
+        outfile.write(cp)
     db = get_database_session()
     db.query(model.Carparks).delete()
+    try:
+        print(crud.get_carparks(db,0,100))
+    except Exception as e:
+        print(e)
     for carpark in cp:
         r = Rate(
             weekdayMin=carpark['weekdayMin'],
