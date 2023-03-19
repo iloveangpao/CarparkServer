@@ -27,13 +27,15 @@ async def root():
 
 from datetime import datetime, timedelta
 import os
-from typing import Optional
+from typing import Optional, Annotated
 print(os.listdir())
 import db.schemas.userSchema as userSchema
 from db.database import SessionLocal, engine
 import db.model as model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel
 
 
 model.Base.metadata.create_all(bind=engine)
@@ -49,38 +51,23 @@ def get_database_session():
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-@app.post("/users/", response_model=userSchema.User)
-def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_session)):
-    #db_user = crud.get_user_by_email(db, email=user.email)
-    #if db_user:
-    #    raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db=db, user=user)
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
-@app.get("/users/", response_model=list[userSchema.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
-    users = crud.get_users(db, skip=skip, limit=limit)
-    return users
-
-
-@app.get("/users/{username}", response_model=userSchema.User)
-def read_user(username: str, db: Session = Depends(get_database_session)):
-    db_user = crud.get_user(db, username=username)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
-
-
-'''User = User()
-
-def fake_hash_password(password: str):
-    return "fakehashed" + password
+class TokenData(BaseModel):
+    username: Optional[str] = None
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+app = FastAPI()
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -89,13 +76,20 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-async def get_user(db: SessionLocal, username: str) -> model.Users:
-    result = await db.execute(select(model.Users).filter_by(username=username))
+
+'''async was giving some errors. seems like it works without async, but leaving the commented line here first'''
+#async def get_user(db: AsyncSession, username: str) -> model.User:
+def get_user(db: AsyncSession, username: str) -> model.User:
+    #result = await db.execute(select(model.User).filter_by(username=username))
+    result = db.execute(select(model.User).filter_by(username=username))
     return result.scalars().first()
 
 
-async def authenticate_user(db : SessionLocal, username: str, password: str) -> model.Users:
-    user = await get_user(db , username)
+'''async was giving some errors. seems like it works without async, but leaving the commented line here first'''
+#async def authenticate_user(db: AsyncSession, username: str, password: str) -> model.User:
+def authenticate_user(db: AsyncSession, username: str, password: str) -> model.User:
+    #user = await get_user(db, username)
+    user = get_user(db, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -114,7 +108,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_current_user(db : SessionLocal = Depends(get_database_session) , token: str = Depends(oauth2_scheme)) -> model.Users:
+'''async was giving some errors. seems like it works without async, but leaving the commented line here first'''
+#async def get_current_user(db: AsyncSession = Depends(get_database_session), token: str = Depends(oauth2_scheme)) -> model.User:
+def get_current_user(db: AsyncSession = Depends(get_database_session), token: str = Depends(oauth2_scheme)) -> model.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -128,21 +124,23 @@ async def get_current_user(db : SessionLocal = Depends(get_database_session) , t
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = await get_user(db, username=token_data.username)
+    user = get_user(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
+'''dont know if we need the disabled feature or not. this fn was causing me errors, but if we dn then screw it'''
+# async def get_current_active_user(current_user: model.User = Depends(get_current_user)):
+#     if current_user.disabled:
+#         raise HTTPException(status_code=400, detail="Inactive user")
+#     return current_user
 
 
 @app.post("/token", response_model=Token)
-async def login_for_access_token(db : SessionLocal = Depends(get_database_session) , form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await authenticate_user(db, form_data.username, form_data.password)
+async def login_for_access_token(db: AsyncSession = Depends(get_database_session), form_data: OAuth2PasswordRequestForm = Depends()):
+    #user = await authenticate_user(db, form_data.username, form_data.password)
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -156,9 +154,34 @@ async def login_for_access_token(db : SessionLocal = Depends(get_database_sessio
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@app.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user'''
+'''basic functions for reading/creating users'''
+
+@app.get("/users/me/", response_model=userSchema.User)
+async def read_users_me(current_user: userSchema.User = Depends(get_current_user)):
+    return current_user
+
+
+@app.post("/users/", response_model=userSchema.User)
+def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_session)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    hashed_password = get_password_hash(user.password)
+    return crud.create_user(db=db, user=user, hashed_password=hashed_password)
+
+
+@app.get("/users/", response_model=list[userSchema.User])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    users = crud.get_users(db, skip=skip, limit=limit)
+    return users
+
+
+@app.get("/users/{user_id}", response_model=userSchema.User)
+def read_user(user_id: int, db: Session = Depends(get_database_session)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
 
 
 ##End Authentication

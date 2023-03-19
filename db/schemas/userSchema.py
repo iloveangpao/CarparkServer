@@ -20,6 +20,7 @@ class TokenData(BaseModel):
 class UserBase(BaseModel):
     username: str
     email: str
+    #disabled: bool
 
 
 class UserCreate(UserBase):
@@ -27,9 +28,8 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
-    # id: int
+    id: int
     # is_active: bool # might not need
-    # bookings: list[Booking] = [] # later add with bookings
 
     class Config:
         orm_mode = True
