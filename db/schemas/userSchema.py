@@ -18,7 +18,7 @@ class TokenData(BaseModel):
 
 
 class UserBase(BaseModel):
-    name: str
+    username: str
     email: str
 
 
@@ -27,7 +27,7 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
-    id: int
+    # id: int
     # is_active: bool # might not need
     # bookings: list[Booking] = [] # later add with bookings
 

@@ -27,8 +27,9 @@ async def root():
 
 from datetime import datetime, timedelta
 import os
+from typing import Optional
 print(os.listdir())
-from db.schemas.userSchema import *
+import db.schemas.userSchema as userSchema
 from db.database import SessionLocal, engine
 import db.model as model
 from sqlalchemy.orm import Session
@@ -51,23 +52,23 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-@app.post("/users/", response_model=User)
-def create_user(user: UserCreate, db: Session = Depends(get_database_session)):
+@app.post("/users/", response_model=userSchema.User)
+def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_session)):
     #db_user = crud.get_user_by_email(db, email=user.email)
     #if db_user:
     #    raise HTTPException(status_code=400, detail="Email already registered")
     return crud.create_user(db=db, user=user)
 
 
-@app.get("/users/", response_model=list[User])
+@app.get("/users/", response_model=list[userSchema.User])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
 
 
-@app.get("/users/{user_id}", response_model=User)
-def read_user(user_id: int, db: Session = Depends(get_database_session)):
-    db_user = crud.get_user(db, user_id=user_id)
+@app.get("/users/{username}", response_model=userSchema.User)
+def read_user(username: str, db: Session = Depends(get_database_session)):
+    db_user = crud.get_user(db, username=username)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
