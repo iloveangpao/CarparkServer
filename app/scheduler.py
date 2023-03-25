@@ -21,6 +21,8 @@ from db.database import SessionLocal, engine
 import db.model as model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+import json
+import datetime
 model.Base.metadata.create_all(bind=engine)
 
 def get_database_session():
@@ -81,41 +83,50 @@ async def add_all_carparks():
     print('working')
     ura = URA()
     cp = ura.getCarparks()
-    with open("sample.json", "w") as outfile:
-        outfile.write(cp)
-    db = get_database_session()
-    db.query(model.Carparks).delete()
+    
     try:
+        with open("sample.json", "w") as outfile:
+            outfile.write(json.dumps(cp))
+        db = get_database_session()
+        deleted = db.query(model.Carparks).delete()
+        db.commit()
+        db.close()
+        print(str(deleted) + " rows were deleted")
+        db = get_database_session()
         print(crud.get_carparks(db,0,100))
+        db.close()
     except Exception as e:
         print(e)
+    print('putting in')
     for carpark in cp:
-        r = Rate(
-            weekdayMin=carpark['weekdayMin'],
-            endTime=carpark['endTime'],
-            weekdayRate=carpark['weekdayRate'],
-            startTime=carpark['startTime'],
-            sunPHRate=carpark['sunPHRate'],
-            sunPHMin=carpark['sunPHMin'],
-            satdayRate=carpark['satdayRate'],
-            satdayMin=carpark['satdayMin']
-        )
-        
-        num = len(carpark['geometries'])
-        locations = []
-        for loc in carpark['geometries']:
-            locations.append(tuple(loc['coordinates'].split(',')))
-        l = Location(
-            num = num,
-            locations = locations
-        )
-        carpark = Carpark(id=0,cp_code = carpark['ppCode'], name=carpark['ppName'], locations=l, Rates=r)
+        if carpark['vehCat'] == "Car":
+            try:
+                r = Rate(
+                    weekdayMin=carpark['weekdayMin'],
+                    endTime=carpark['endTime'],
+                    weekdayRate=carpark['weekdayRate'],
+                    startTime=carpark['startTime'],
+                    sunPHRate=carpark['sunPHRate'],
+                    sunPHMin=carpark['sunPHMin'],
+                    satdayRate=carpark['satdayRate'],
+                    satdayMin=carpark['satdayMin']
+                )
+                
+                num = len(carpark['geometries'])
+                locations = []
+                for loc in carpark['geometries']:
+                    locations.append(tuple(loc['coordinates'].split(',')))
+                l = Location(
+                    num = num,
+                    locations = locations
+                )
+                carpark = Carpark(id=0,cp_code = carpark['ppCode'], name=carpark['ppName'], locations=l, Rates=r)
 
-        try:
-            crud.create_carpark(db=db, carpark=carpark)
-            db.close()
-        except Exception as e:
-            print(e)
-
+                db = get_database_session()
+                crud.create_carpark(db=db, carpark=carpark)
+                db.close()
+            except Exception as e:
+                print(e)
+    print('done')
 if __name__ == "__main__":
     app.run()
