@@ -1,5 +1,6 @@
 from datetime import time
 from pydantic import BaseModel
+from typing import Optional
 
 class Rate(BaseModel):
     weekdayMin: str
@@ -35,6 +36,7 @@ class Carpark(BaseModel):
     name: str
     locations: Location
     Rates: Rate
+    BookableSlots: Optional[dict] = None
 
     class Config:
         orm_mode = True

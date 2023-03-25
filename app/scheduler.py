@@ -68,9 +68,10 @@ async def create_carpark():
     )
     print('b4parsing')
     # print(cp)
-    carpark = Carpark(id=0,cp_code = temp['ppCode'], name=temp['ppName'], locations=l, Rates=r)
-    print('yay',carpark)
+    
     try:
+        carpark = Carpark(id=0,cp_code = temp['ppCode'], name=temp['ppName'], locations=l, Rates=r, BookableSlots = {})
+        print('yay',carpark)
         db = get_database_session()
         crud.create_carpark(db=db, carpark=carpark)
         db.close()
@@ -120,7 +121,7 @@ async def add_all_carparks():
                     num = num,
                     locations = locations
                 )
-                carpark = Carpark(id=0,cp_code = carpark['ppCode'], name=carpark['ppName'], locations=l, Rates=r)
+                carpark = Carpark(id=0,cp_code = carpark['ppCode'], name=carpark['ppName'], locations=l, Rates=r, BookableSlots = {})
 
                 db = get_database_session()
                 crud.create_carpark(db=db, carpark=carpark)

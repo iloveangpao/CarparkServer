@@ -210,7 +210,7 @@ def read_carparks(skip: int = 0, limit: int = 100, db: Session = Depends(get_dat
         # test = json.loads(i.locations)
         # print(test)
 
-        carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Rates = i.Rates))
+        carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Rates = i.Rates, BookableSlots = i.BookableSlots))
     return carparks
 
 @app.get("/avail/")
