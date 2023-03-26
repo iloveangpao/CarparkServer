@@ -197,6 +197,10 @@ import db.crud as crud
 import os, json
 from filter import Filter
 
+@app.get("/rawCP")
+def raw():
+    return URA().getCarparks()
+
 @app.post("/carpark/", response_model=Carpark)
 def create_carpark(carpark: Carpark, db: Session = Depends(get_database_session)):
     return crud.create_carpark(db=db, carpark=carpark)
@@ -205,14 +209,14 @@ def create_carpark(carpark: Carpark, db: Session = Depends(get_database_session)
 @app.get("/carpark/", response_model=list[Carpark])
 def read_carparks(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
     carparks = crud.get_carparks(db, skip=skip, limit=limit)
-    carparkList = []
-    for i in carparks:
-        print(i.locations)
-        print(type(i.locations))
-        # test = json.loads(i.locations)
-        # print(test)
+    # carparkList = []
+    # for i in carparks:
+    #     print(i.locations)
+    #     print(type(i.locations))
+    #     # test = json.loads(i.locations)
+    #     # print(test)
 
-        carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Rates = i.Rates, BookableSlots = i.BookableSlots))
+    #     carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Rates = i.Rates, BookableSlots = i.BookableSlots))
     return carparks
 
 @app.get("/avail/")
@@ -244,10 +248,11 @@ async def getSearchResult(searchVal: str):
 async def getNearbyCP(latLon: str,filterParam: str, db: Session = Depends(get_database_session)):
     subjectCoor = latLon.split(',')
     carparks = crud.get_carparks(db = db)
-    print(carparks)
+    # print(carparks)
     withinFiveMin = Filter().getNearby(carparks,subjectCoor)
-    print(withinFiveMin)
-    return carparks
+    # print(withinFiveMin)
+    return withinFiveMin
+
 
     
 
