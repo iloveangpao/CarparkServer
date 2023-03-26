@@ -166,6 +166,10 @@ async def read_users_me(current_user: userSchema.User = Depends(get_current_user
 @app.post("/users/", response_model=userSchema.User)
 def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_session)):
     db_user = crud.get_user_by_email(db, email=user.email)
+    if '@' not in user.email:
+        raise HTTPException(status_code=400, detail="Invalid email address")
+    if len(user.password) < 8:
+        raise HTTPException(status_code=400, detail="Password too short")
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed_password = get_password_hash(user.password)
