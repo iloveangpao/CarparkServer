@@ -191,6 +191,7 @@ def read_user(user_id: int, db: Session = Depends(get_database_session)):
 
 #class for accessing URA api
 from app.ura import URA
+from app.onemap import OneMap
 from db.schemas.carparkSchema import *
 import db.crud as crud
 import os, json
@@ -233,6 +234,19 @@ async def getAvailCP():
 
     print(avails)
     return avails
+
+@app.get("/search/{searchVal}")
+async def getSearchResult(searchVal: str):
+    return OneMap().getSearch(searchVal)
+
+@app.get("/nearbyCP/{latLon}/{filterParam}")
+async def getNearbyCP(latLon: str,filterParam: str, db: Session = Depends(get_database_session)):
+    subjectCoor = latLon.split(',')
+    carparks = crud.get_carparks(db = db)
+    print(carparks)
+    return carparks
+
+    
 
 
 # Import the Rocketry app

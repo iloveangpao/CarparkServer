@@ -23,6 +23,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 import json
 import datetime
+import time
+import re
 model.Base.metadata.create_all(bind=engine)
 
 def get_database_session():
@@ -99,7 +101,32 @@ async def add_all_carparks():
     except Exception as e:
         print(e)
     print('putting in')
-    for carpark in cp:
+    
+    gmt_time = time.gmtime()
+
+    print(gmt_time)
+    gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
+
+    gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
+    print(gmt_plus.time())
+
+    result = []
+
+    for i in cp:
+        startWS = re.search('\s',i['startTime']).span()
+        startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
+        convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
+
+        endWS = re.search('\s',i['endTime']).span()
+        endTime = startTime = '%s.00 %s'%(i['endTime'][:startWS[0]] , i['endTime'][startWS[1]:])
+        convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
+
+        if gmt_plus.time() >= convertedStart and gmt_plus.time() <= convertedEnd:
+            result.append(i)
+
+    print(result)
+
+    for carpark in result:
         if carpark['vehCat'] == "Car":
             try:
                 r = Rate(

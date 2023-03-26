@@ -47,38 +47,38 @@ class URA:
         return r.json()['Result']
 
 
-cp = URA().getCarparks()
-import datetime
-import time
-gmt_time = time.gmtime()
+# cp = URA().getCarparks()
+# import datetime
+# import time
+# import re
+# gmt_time = time.gmtime()
 
-print(gmt_time)
-gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
+# print(gmt_time)
+# gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
 
-gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
-print(gmt_plus.time())
+# gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
+# print(gmt_plus.time())
 
-weekday = gmt_plus.date().weekday() < 5
-print(weekday)
+# result = []
 
-avails = URA().getAvail(
-)
-print(avails)
+# for i in cp:
+#     startWS = re.search('\s',i['startTime']).span()
+#     startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
+#     convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
 
-from SVYconverter import SVY21
+#     endWS = re.search('\s',i['endTime']).span()
+#     endTime = startTime = '%s.00 %s'%(i['endTime'][:startWS[0]] , i['endTime'][startWS[1]:])
+#     convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
+#     print(convertedStart,convertedEnd)
 
-for i in range(len(avails)):
-    temp = avails[i]
-    tempCoor = temp['geometries']
-    newCoor = []
-    for j in tempCoor:
-        tempLatLon = [float(k) for k in j['coordinates'].split(',')]
-        print(tempLatLon)
-        convert = SVY21().computeLatLon(tempLatLon[0],tempLatLon[1])
-        print(convert)
-        newCoor.append({'coordinates':'%s,%s'%(convert[0],convert[1])})
-    print(newCoor)
-    avails[i]['geometries'] = newCoor
+#     if gmt_plus.time() >= convertedStart and gmt_plus.time() <= convertedEnd:
+#         result.append(i)
 
-print(avails)
+# print(result)
+
+
+# weekday = gmt_plus.date().weekday() < 5
+# print(weekday)
+
+
 
