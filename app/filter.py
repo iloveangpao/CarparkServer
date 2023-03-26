@@ -9,12 +9,22 @@ class Filter():
         result = []
 
     def getNearby(self, data: list, base: list):
+        QUOTA = 300
         withinFiveMin = []
         for i in data:
+            timeTaken = QUOTA + 1
             tempXY = i['locations']['locations'][0]
-            timeTaken = OneMap().getRoute(tempXY,base)['total_time']
-            if timeTaken <=  300:
-                withinFiveMin.append(i)
+            
+            try:
+                timeTaken = OneMap().getRoute(tempXY,base)['total_time']
+                if i['name'] == "ANGULLIA PARK OFF STREET":
+                    print('yay', timeTaken)
+                print(timeTaken)
+                if timeTaken <=  QUOTA:
+                    withinFiveMin.append(i)
+            except:
+                pass
+            
 
         return withinFiveMin
 

@@ -47,38 +47,38 @@ class URA:
         return r.json()['Result']
 
 
-cp = URA().getCarparks()
-import datetime
-import time
-import re
-gmt_time = time.gmtime()
+# cp = URA().getCarparks()
+# import datetime
+# import time
+# import re
+# gmt_time = time.gmtime()
 
-print(gmt_time)
-gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
+# print(gmt_time)
+# gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
 
-gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
-print(gmt_plus.time())
+# gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
+# print(gmt_plus.time())
 
-result = []
+# result = []
 
-for i in cp:
-    startWS = re.search('\s',i['startTime']).span()
-    startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
-    convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
+# for i in cp:
+#     startWS = re.search('\s',i['startTime']).span()
+#     startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
+#     convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
 
-    endWS = re.search('\s',i['endTime']).span()
-    endTime = startTime = '%s.00 %s'%(i['endTime'][:startWS[0]] , i['endTime'][startWS[1]:])
-    convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
-    print(convertedStart,convertedEnd)
+#     endWS = re.search('\s',i['endTime']).span()
+#     endTime = startTime = '%s.00 %s'%(i['endTime'][:startWS[0]] , i['endTime'][startWS[1]:])
+#     convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
+#     print(convertedStart,convertedEnd)
 
-    if gmt_plus.time() >= convertedStart and gmt_plus.time() <= convertedEnd:
-        result.append(i)
+#     if convertedStart <= gmt_plus.time() <= convertedEnd or convertedEnd < convertedStart and (convertedStart<gmt_plus.time() or convertedEnd > gmt_plus.time()):
+#         result.append(i)
 
-print(result)
+# print(result)
 
 
-weekday = gmt_plus.date().weekday() < 5
-print(weekday)
+# weekday = gmt_plus.date().weekday() < 5
+# print(weekday)
 
 
 

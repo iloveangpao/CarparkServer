@@ -38,8 +38,8 @@ class OneMap:
         actStart = ','.join( [str(comp) for comp in start] )
         actEnd = ','.join( [str(comp) for comp in end] )
         if SVY:
-            actStart = ','.join( [str(comp) for comp in SVY21().computeLatLon(start[0],start[1])] )
-            actEnd = ','.join( [str(comp) for comp in SVY21().computeLatLon(end[0],end[1])] )
+            actStart = ','.join( [str(comp) for comp in SVY21().computeLatLon(float(start[0]),float(start[1]))] )
+            actEnd = ','.join( [str(comp) for comp in SVY21().computeLatLon(float(end[0]),float(end[1]))] )
 
 
         params = {
@@ -57,9 +57,11 @@ class OneMap:
         r = requests.get("https://developers.onemap.sg/privateapi/routingsvc/route",
                          params=params, headers=headers
                          )
-        print(r.json())
+        # print(r.json())
 
         result = r.json()
+        if 'error' in result:
+            raise Exception(result['error'])
         return result['route_summary']
 
     

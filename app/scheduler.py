@@ -121,7 +121,7 @@ async def add_all_carparks():
         endTime = '%s.00 %s'%(i['endTime'][:endWS[0]] , i['endTime'][endWS[1]:])
         convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
 
-        if gmt_plus.time() >= convertedStart and gmt_plus.time() <= convertedEnd:
+        if convertedStart <= gmt_plus.time() <= convertedEnd or convertedEnd < convertedStart and (convertedStart<gmt_plus.time() or convertedEnd > gmt_plus.time()):
             result.append(i)
 
     print(result)
