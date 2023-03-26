@@ -1,4 +1,4 @@
-
+from onemap import OneMap
 
 class Filter():
     def __init__(self) -> None:
@@ -11,7 +11,12 @@ class Filter():
     def getNearby(self, data: list, base: list):
         withinFiveMin = []
         for i in data:
-            i['']
+            tempXY = i['locations']['locations'][0]
+            timeTaken = OneMap().getRoute(tempXY,base)['total_time']
+            if timeTaken <=  300:
+                withinFiveMin.append(i)
+
+        return withinFiveMin
 
 
 

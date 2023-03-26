@@ -36,7 +36,7 @@ def get_database_session():
 
 ##daily 
 # @app.task(daily.at("03:40"))
-@app.task('daily')
+@app.task('every 15 minutes')
 async def create_carpark():
     print('working')
     ura = URA()
@@ -118,7 +118,7 @@ async def add_all_carparks():
         convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
 
         endWS = re.search('\s',i['endTime']).span()
-        endTime = startTime = '%s.00 %s'%(i['endTime'][:startWS[0]] , i['endTime'][startWS[1]:])
+        endTime = '%s.00 %s'%(i['endTime'][:endWS[0]] , i['endTime'][endWS[1]:])
         convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
 
         if gmt_plus.time() >= convertedStart and gmt_plus.time() <= convertedEnd:

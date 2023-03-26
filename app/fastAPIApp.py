@@ -195,6 +195,7 @@ from app.onemap import OneMap
 from db.schemas.carparkSchema import *
 import db.crud as crud
 import os, json
+from filter import Filter
 
 @app.post("/carpark/", response_model=Carpark)
 def create_carpark(carpark: Carpark, db: Session = Depends(get_database_session)):
@@ -244,6 +245,8 @@ async def getNearbyCP(latLon: str,filterParam: str, db: Session = Depends(get_da
     subjectCoor = latLon.split(',')
     carparks = crud.get_carparks(db = db)
     print(carparks)
+    withinFiveMin = Filter().getNearby(carparks,subjectCoor)
+    print(withinFiveMin)
     return carparks
 
     

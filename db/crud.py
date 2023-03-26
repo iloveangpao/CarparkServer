@@ -9,16 +9,24 @@ The functions can be reused elsewhere
 
 
 from sqlalchemy.orm import Session
+from sqlalchemy import inspect
 
 from db import model
 from db.schemas.carparkSchema import *
 from db.schemas.userSchema import *
 
 # CARPARKS
+def object_as_dict(obj):
+    return {c.key: getattr(obj, c.key)
+            for c in inspect(obj).mapper.column_attrs}
+
 def get_carparks(db: Session, skip: int = 0, limit: int = 100):
     print(db.query(model.Carparks).offset(skip).limit(limit).all())
-    return db.query(model.Carparks).offset(skip).limit(limit).all()
-
+    cp = db.query(model.Carparks).offset(skip).limit(limit).all()
+    cpsAsDict = []
+    for temp in cp:
+        cpsAsDict.append(object_as_dict(temp))
+    return cpsAsDict
 
 def get_carparks_basic_info(db: Session):
     return db.query(model.Carparks).add_column(Carpark.id).add_column(Carpark.name).all()
