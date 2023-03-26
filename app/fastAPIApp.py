@@ -165,9 +165,28 @@ async def read_users_me(current_user: userSchema.User = Depends(get_current_user
 
 @app.post("/users/", response_model=userSchema.User)
 def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_session)):
+    # username validation
+    db_user = crud.get_user_by_username(db, username=user.username)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    if not user.username:
+        raise HTTPException(status_code=400, detail="Please key in a username")
+    
+    # email validation
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+    if not user.email:
+        raise HTTPException(status_code=400, detail="Please key in an email address")
+    if '@' not in user.email:
+        raise HTTPException(status_code=400, detail="Invalid email address")
+    
+    # password validation
+    if len(user.password) < 8:
+        raise HTTPException(status_code=400, detail="Password too short")
+    if not user.password:
+        raise HTTPException(status_code=400, detail="Please key in a password")
+    
     hashed_password = get_password_hash(user.password)
     return crud.create_user(db=db, user=user, hashed_password=hashed_password)
 
@@ -184,6 +203,17 @@ def read_user(user_id: int, db: Session = Depends(get_database_session)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
+
+@app.delete("/users/{user_id}", response_model=userSchema.User)
+def delete_user(user_id: int, db: Session = Depends(get_database_session)):
+    user = crud.get_user(db, user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Hero not found")
+    db.delete(user)
+    db.commit()
+    return user
+
 
 
 ##End Authentication

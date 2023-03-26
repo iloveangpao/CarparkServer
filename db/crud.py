@@ -67,4 +67,9 @@ def create_user(db: Session, user: UserCreate, hashed_password):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+
+
+
     
