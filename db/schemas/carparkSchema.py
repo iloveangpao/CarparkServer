@@ -1,6 +1,7 @@
 from datetime import time
 from pydantic import BaseModel
 from typing import Optional
+from db.schemas.lotSchema import Lot
 
 class Rate(BaseModel):
     weekdayMin: str
@@ -36,7 +37,8 @@ class Carpark(BaseModel):
     name: str
     locations: Location
     Rates: Rate
-    BookableSlots: Optional[dict] = None
+    # BookableSlots: Optional[dict] = None
+    lots: list[Lot] = []
 
     class Config:
         orm_mode = True
