@@ -16,8 +16,9 @@ class Carparks(Base):
     name = Column(Text)
     locations = Column(PickleType)
     Rates = Column(PickleType)
-    
+
     lots = relationship("Lot", back_populates="carpark")
+    favourites = relationship("Favourite", back_populates="carpark")
 
     #BookableSlots = Column(PickleType, nullable = True)
 
@@ -31,6 +32,7 @@ class User(Base):
     hashed_password = Column(String(64))
 
     bookings = relationship("Booking", back_populates="user")
+    favourites = relationship("Favourite", back_populates="user")
 
 
 class Lot(Base):
@@ -55,3 +57,12 @@ class Booking(Base):
     user = relationship("User", back_populates="bookings")
     lot = relationship("Lot", back_populates="bookings")
     
+class Favourite(Base):
+    __tablename__ = "favourites"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    carpark_id = Column(Integer, ForeignKey("carparks.id"))
+
+    user = relationship("User", back_populates="favourites")
+    carpark = relationship("Carparks", back_populates="favourites")
