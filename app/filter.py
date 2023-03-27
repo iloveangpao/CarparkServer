@@ -1,4 +1,5 @@
 from onemap import OneMap
+import copy
 
 class Filter():
     def __init__(self) -> None:
@@ -7,6 +8,17 @@ class Filter():
 
     def sort(self,type: str, data: list):
         result = []
+
+        size = len(data)
+
+        for i in data:
+            temp = i
+            temp['toSort'] = temp[type]
+            result.append(temp)
+        
+        self.quickSort(result, 0, size - 1)
+
+
 
     def getNearby(self, data: list, base: list):
         QUOTA = 300
@@ -17,8 +29,6 @@ class Filter():
             
             try:
                 timeTaken = OneMap().getRoute(tempXY,base)['total_time']
-                if i['name'] == "ANGULLIA PARK OFF STREET":
-                    print('yay', timeTaken)
                 print(timeTaken)
                 if timeTaken <=  QUOTA:
                     withinFiveMin.append(i)
@@ -46,7 +56,7 @@ class Filter():
 
     def partition(array,low,high):
             # choose the rightmost element as pivot
-        pivot = array[high]
+        pivot = array[high]['toSort']
     
         # pointer for greater element
         i = low - 1
@@ -54,7 +64,7 @@ class Filter():
         # traverse through all elements
         # compare each element with pivot
         for j in range(low, high):
-            if array[j] <= pivot:
+            if array[j]['toSort'] <= pivot:
     
                 # If element smaller than pivot is found
                 # swap it with the greater element pointed by i
@@ -114,14 +124,7 @@ def quickSort(array, low, high):
         # Recursive call on the right of pivot
         quickSort(array, pi + 1, high)
  
- 
-data = [1, 7, 4, 1, 10, 9, -2]
-print("Unsorted Array")
-print(data)
- 
-size = len(data)
- 
-quickSort(data, 0, size - 1)
- 
-print('Sorted Array in Ascending Order:')
-print(data)
+from ura import URA
+cp = URA().getCarparks()
+
+
