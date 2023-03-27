@@ -17,6 +17,7 @@ rocketry = "^2.5.1"
 pymysql = "^1.0.2"
 python-jose = "^3.3.0"
 passlib = "^1.7.4"
+geopy = "^2.3.0"
 
 
 [build-system]

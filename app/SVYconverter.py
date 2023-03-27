@@ -33,6 +33,21 @@ class SVY21:
         self.A4 = (15. / 256.) * (self.e4 + (3 * self.e6 / 4));
         self.A6 = 35 * self.e6 / 3072;
 
+    def convertFromURA(self,cp: list):
+        for i in range(len(cp)):
+            temp = cp[i]
+            tempCoor = temp['geometries']
+            newCoor = []
+            for j in tempCoor:
+                tempLatLon = [float(k) for k in j['coordinates'].split(',')]
+                print(tempLatLon)
+                convert = self.computeLatLon(tempLatLon[0],tempLatLon[1])
+                print(convert)
+                newCoor.append({'coordinates':'%s,%s'%(convert[0],convert[1])})
+            print(newCoor)
+            cp[i]['geometries'] = newCoor
+
+        return cp
     def computeSVY21(self, lat, lon):
         """
         Returns a pair (N, E) representing Northings and Eastings in SVY21.

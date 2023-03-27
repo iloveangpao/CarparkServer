@@ -20,9 +20,12 @@ def object_as_dict(obj):
     return {c.key: getattr(obj, c.key)
             for c in inspect(obj).mapper.column_attrs}
 
-def get_carparks(db: Session, skip: int = 0, limit: int = 100):
-    print(db.query(model.Carparks).offset(skip).limit(limit).all())
-    cp = db.query(model.Carparks).offset(skip).limit(limit).all()
+def get_carparks(db: Session, skip: int = 0, limit: int = -1):
+    # print(db.query(model.Carparks).offset(skip).limit(limit).all())
+    if limit > 0:
+        cp = db.query(model.Carparks).offset(skip).limit(limit).all()
+    else:
+        cp = db.query(model.Carparks).offset(skip).all()
     cpsAsDict = []
     for temp in cp:
         cpsAsDict.append(object_as_dict(temp))

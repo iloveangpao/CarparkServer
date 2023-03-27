@@ -1,5 +1,8 @@
 import requests
 from parsers import config
+import datetime
+import time
+import re
 
 class URA:
     def __init__(self, getType = None):
@@ -46,7 +49,67 @@ class URA:
                          )
         return r.json()['Result']
 
+    def defCPAftTiming(self, cp):
+        # print('into timing')
+        gmt_time = time.gmtime()
 
+        # print(gmt_time)
+        gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
+
+        gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
+        # print(gmt_plus.time())
+
+        result = []
+
+        for i in cp:
+            if i['startTime'] <= gmt_plus.time() <= i['endTime'] or i['endTime'] < i['startTime'] and (i['startTime']<gmt_plus.time() or i['endTime'] > gmt_plus.time()):
+                
+                result.append(i)
+
+        return result
+    
+    def defCPFormatted(self,cp): ## change rates to float, time to 24hr
+        # print('into formatting')
+        newCP = []
+        count = 0
+        for i in cp:
+            newCP.append(i)
+
+            wdRate = i['weekdayRate']
+            sunPHRate = i['sunPHRate']
+            satdayRate = i['satdayRate']
+            newWDRate = float(wdRate[1:])
+            newSunPHRate = float(sunPHRate[1:])
+            newSatDayRate = float(satdayRate[1:])
+            
+            newCP[count]['weekdayRate'] = newWDRate
+            newCP[count]['sunPHRate'] = newSunPHRate
+            newCP[count]['satdayRate'] = newSatDayRate
+
+            startWS = re.search('\s',i['startTime']).span()
+            startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
+            convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
+
+            endWS = re.search('\s',i['endTime']).span()
+            endTime = '%s.00 %s'%(i['endTime'][:endWS[0]] , i['endTime'][endWS[1]:])
+            convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
+
+            newCP[count]['startTime'] = convertedStart
+            newCP[count]['endTime'] = convertedEnd
+
+            count += 1
+
+        return newCP
+
+
+    def getCPFinal(self):
+        # print('test 1')
+        cp = self.getCarparks()
+        # print('test2')
+        newCP = self.defCPAftTiming((self.defCPFormatted(cp)))
+        return newCP
+
+# print(URA().getCPFinal())
 # cp = URA().getCarparks()
 # import datetime
 # import time

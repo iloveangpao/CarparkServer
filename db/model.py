@@ -13,8 +13,8 @@ class Carparks(Base):
     id = Column(Integer, primary_key=True, index = True)
     cp_code = Column(Text)
     name = Column(Text)
-    locations = Column(JSON)
-    Rates = Column(JSON)
+    locations = Column(PickleType)
+    Rates = Column(PickleType)
 
     BookableSlots = Column(PickleType, nullable = True)
 

@@ -237,7 +237,7 @@ def create_carpark(carpark: Carpark, db: Session = Depends(get_database_session)
 
 
 @app.get("/carpark/", response_model=list[Carpark])
-def read_carparks(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+def read_carparks(skip: int = 0, limit: int = -1, db: Session = Depends(get_database_session)):
     carparks = crud.get_carparks(db, skip=skip, limit=limit)
     # carparkList = []
     # for i in carparks:
@@ -254,21 +254,7 @@ async def getAvailCP():
     avails = URA().getAvail()
     from SVYconverter import SVY21
 
-    for i in range(len(avails)):
-        temp = avails[i]
-        tempCoor = temp['geometries']
-        newCoor = []
-        for j in tempCoor:
-            tempLatLon = [float(k) for k in j['coordinates'].split(',')]
-            print(tempLatLon)
-            convert = SVY21().computeLatLon(tempLatLon[0],tempLatLon[1])
-            print(convert)
-            newCoor.append({'coordinates':'%s,%s'%(convert[0],convert[1])})
-        print(newCoor)
-        avails[i]['geometries'] = newCoor
-
-    print(avails)
-    return avails
+    return SVY21().convertFromURA(avails)
 
 @app.get("/search/{searchVal}")
 async def getSearchResult(searchVal: str):

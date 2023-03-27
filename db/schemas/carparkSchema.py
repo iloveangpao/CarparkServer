@@ -4,12 +4,12 @@ from typing import Optional
 
 class Rate(BaseModel):
     weekdayMin: str
-    endTime: str #time
-    weekdayRate: str #float
-    startTime: str #time
-    sunPHRate: str #float
+    endTime: time
+    weekdayRate: float
+    startTime: time
+    sunPHRate: float
     sunPHMin: str
-    satdayRate: str #float
+    satdayRate: float
     satdayMin: str
 
 

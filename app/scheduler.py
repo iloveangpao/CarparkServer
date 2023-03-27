@@ -22,9 +22,7 @@ import db.model as model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 import json
-import datetime
-import time
-import re
+
 model.Base.metadata.create_all(bind=engine)
 
 def get_database_session():
@@ -34,100 +32,77 @@ def get_database_session():
     finally:
         db.close()
 
-##daily 
-# @app.task(daily.at("03:40"))
-@app.task('every 15 minutes')
-async def create_carpark():
-    print('working')
-    ura = URA()
-    cp = ura.getCarparks()
-    temp = cp[0]
-    r = Rate(
-        weekdayMin=temp['weekdayMin'],
-        endTime=temp['endTime'],
-        weekdayRate=temp['weekdayRate'],
-        startTime=temp['startTime'],
-        sunPHRate=temp['sunPHRate'],
-        sunPHMin=temp['sunPHMin'],
-        satdayRate=temp['satdayRate'],
-        satdayMin=temp['satdayMin']
-    )
-    print('aftrate')
+# ##daily 
+# # @app.task(daily.at("03:40"))
+# @app.task('every 15 minutes')
+# async def create_carpark():
+#     print('working')
+#     ura = URA()
+#     cp = ura.getCarparks()
+#     temp = cp[0]
+#     r = Rate(
+#         weekdayMin=temp['weekdayMin'],
+#         endTime=temp['endTime'],
+#         weekdayRate=temp['weekdayRate'],
+#         startTime=temp['startTime'],
+#         sunPHRate=temp['sunPHRate'],
+#         sunPHMin=temp['sunPHMin'],
+#         satdayRate=temp['satdayRate'],
+#         satdayMin=temp['satdayMin']
+#     )
+#     print('aftrate')
     
-    print(temp)
-    print(type(temp['geometries']))
-    print(temp['geometries'])
-    num = len(temp['geometries'])
-    print(num)
-    locations = []
-    for loc in temp['geometries']:
-        print(loc)
-        locations.append(tuple(loc['coordinates'].split(',')))
-    print(locations)
-    l = Location(
-        num = num,
-        locations = locations
-    )
-    print('b4parsing')
-    # print(cp)
+#     print(temp)
+#     print(type(temp['geometries']))
+#     print(temp['geometries'])
+#     num = len(temp['geometries'])
+#     print(num)
+#     locations = []
+#     for loc in temp['geometries']:
+#         print(loc)
+#         locations.append(tuple(loc['coordinates'].split(',')))
+#     print(locations)
+#     l = Location(
+#         num = num,
+#         locations = locations
+#     )
+#     print('b4parsing')
+#     # print(cp)
     
-    try:
-        carpark = Carpark(id=0,cp_code = temp['ppCode'], name=temp['ppName'], locations=l, Rates=r, BookableSlots = {})
-        print('yay',carpark)
-        db = get_database_session()
-        crud.create_carpark(db=db, carpark=carpark)
-        db.close()
-    except Exception as e:
-        print(e)
-    print('hehe')
+#     try:
+#         carpark = Carpark(id=0,cp_code = temp['ppCode'], name=temp['ppName'], locations=l, Rates=r, BookableSlots = {})
+#         print('yay',carpark)
+#         db = get_database_session()
+#         crud.create_carpark(db=db, carpark=carpark)
+#         db.close()
+#     except Exception as e:
+#         print(e)
+#     print('hehe')
 
-@app.task("after task 'create_carpark'")
+@app.task('every 15 minutes')
 async def add_all_carparks():
     print('working')
-    ura = URA()
-    cp = ura.getCarparks()
-    
     try:
-        with open("sample.json", "w") as outfile:
-            outfile.write(json.dumps(cp))
+        ura = URA()
+        cp = ura.getCPFinal()
         db = get_database_session()
         deleted = db.query(model.Carparks).delete()
         db.commit()
         db.close()
         print(str(deleted) + " rows were deleted")
         db = get_database_session()
-        print(crud.get_carparks(db,0,100))
+        # print(crud.get_carparks(db,0,100))
         db.close()
     except Exception as e:
         print(e)
     print('putting in')
-    
-    gmt_time = time.gmtime()
 
-    print(gmt_time)
-    gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
-
-    gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
-    print(gmt_plus.time())
-
-    result = []
-
-    for i in cp:
-        startWS = re.search('\s',i['startTime']).span()
-        startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
-        convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
-
-        endWS = re.search('\s',i['endTime']).span()
-        endTime = '%s.00 %s'%(i['endTime'][:endWS[0]] , i['endTime'][endWS[1]:])
-        convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
-
-        if convertedStart <= gmt_plus.time() <= convertedEnd or convertedEnd < convertedStart and (convertedStart<gmt_plus.time() or convertedEnd > gmt_plus.time()):
-            result.append(i)
-
-    print(result)
-
-    for carpark in result:
+    for carpark in cp:
+        if carpark['ppName'] == 'YISHUN INDUSTRIAL PARK A':
+            print('fount', carpark, carpark['vehCat'] == "Car")
         if carpark['vehCat'] == "Car":
+            if carpark['ppName'] == 'YISHUN INDUSTRIAL PARK A':
+                print('yay')
             try:
                 r = Rate(
                     weekdayMin=carpark['weekdayMin'],
