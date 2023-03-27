@@ -1,26 +1,10 @@
 from pydantic import BaseModel
-from typing import Optional
-
-'''class User(BaseModel):
-    username : str = None
-    class Config:
-        orm_mode = True
-
-class UserInDB(User):
-    hashed_password : str
-
-class Token(BaseModel):
-    access_token : str
-    token_type : str
-
-class TokenData(BaseModel):
-    username : Optional[str] = None'''
-
+from db.schemas.bookingSchema import Booking
 
 class UserBase(BaseModel):
     username: str
     email: str
-    #disabled: bool
+    bookings: list[Booking] = []
 
 
 class UserCreate(UserBase):

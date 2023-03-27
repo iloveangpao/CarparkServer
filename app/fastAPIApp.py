@@ -246,6 +246,7 @@ def read_carparks(skip: int = 0, limit: int = -1, db: Session = Depends(get_data
     #     # test = json.loads(i.locations)
     #     # print(test)
 
+
     #     carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Rates = i.Rates, BookableSlots = i.BookableSlots))
     return carparks
 
@@ -312,3 +313,41 @@ async def get_tasks():
 if __name__ == "__main__":
     app.run()
     print(os.getcwd())
+
+
+
+
+# Booking endpoints
+import db.schemas.bookingSchema as bookingSchema
+import db.schemas.lotSchema as lotSchema
+
+@app.post("/booking/", response_model=bookingSchema.Booking)
+def create_booking(user_id: int, lot_id: int, 
+                   booking: bookingSchema.BookingCreate, db: Session = Depends(get_database_session)):
+    return crud.create_booking(db=db, booking=booking, user_id=user_id, lot_id=lot_id)
+
+
+@app.get("/booking/", response_model=list[bookingSchema.Booking])
+def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    booking = crud.get_bookings(db, skip=skip, limit=limit)
+    return booking
+
+
+'''@app.get("/booking/me/", response_model=list[bookingSchema.Booking])
+def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    booking = crud.get_bookings(db, skip=skip, limit=limit)
+    return booking'''
+
+
+
+
+# Lot endpoints
+@app.post("/lot/", response_model=lotSchema.Lot)
+def create_lot(carpark_id: int, lot: lotSchema.LotCreate, db: Session = Depends(get_database_session)):
+    return crud.create_lot(db=db, lot=lot, carpark_id=carpark_id)
+
+
+@app.get("/lot/", response_model=list[lotSchema.Lot])
+def read_lots(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    lot = crud.get_lots(db, skip=skip, limit=limit)
+    return lot

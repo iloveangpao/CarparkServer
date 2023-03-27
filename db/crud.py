@@ -14,6 +14,8 @@ from sqlalchemy import inspect
 from db import model
 from db.schemas.carparkSchema import *
 from db.schemas.userSchema import *
+from db.schemas.lotSchema import *
+from db.schemas.bookingSchema import *
 
 # CARPARKS
 def object_as_dict(obj):
@@ -48,7 +50,7 @@ def create_carpark(db: Session, carpark: Carpark):
 
 
 # USERS
-def get_user(db: Session, user_id: str):
+def get_user(db: Session, user_id: int):
     return db.query(model.User).filter(model.User.id == user_id).first()
 
 
@@ -72,7 +74,30 @@ def create_user(db: Session, user: UserCreate, hashed_password):
     return db_user
 
 
+# LOTS
+def create_lot(db: Session, lot: LotCreate, carpark_id: int):
+    db_lot = model.Lot(**lot.dict(), carpark_id=carpark_id)
+    db.add(db_lot)
+    db.commit()
+    db.refresh(db_lot)
+    return db_lot
 
+
+def get_lots(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(model.Lot).offset(skip).limit(limit).all()
+
+
+# BOOKINGS
+def create_booking(db: Session, booking: BookingCreate, user_id: int, lot_id: int):
+    db_booking = model.Booking(**booking.dict(), user_id=user_id, lot_id=lot_id)
+    db.add(db_booking)
+    db.commit()
+    db.refresh(db_booking)
+    return db_booking
+
+
+def get_bookings(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(model.Booking).offset(skip).limit(limit).all()
 
 
     
