@@ -3,6 +3,7 @@ from parsers import config
 import datetime
 import time
 import re
+from SVYconverter import SVY21
 
 class URA:
     def __init__(self, getType = None):
@@ -107,7 +108,27 @@ class URA:
         cp = self.getCarparks()
         # print('test2')
         newCP = self.defCPAftTiming((self.defCPFormatted(cp)))
-        return newCP
+        return self.convertToLatLon(newCP)
+
+    def convertToLatLon(self,cp):
+        for i in range(len(cp)):
+            temp = cp[i]
+            tempCoor = temp['geometries']
+            newCoor = []
+            for j in tempCoor:
+                tempLatLon = [float(k) for k in j['coordinates'].split(',')]
+                print(tempLatLon)
+                convert = SVY21().computeLatLon(tempLatLon[0],tempLatLon[1])
+                print(convert)
+                newCoor.append({'coordinates':'%s,%s'%(convert[0],convert[1])})
+            print(newCoor)
+            cp[i]['geometries'] = newCoor
+
+        return cp
+
+    def getAvailFinal(self):
+        cp = self.getAvail()
+        return self.convertToLatLon(cp)
 
 # print(URA().getCPFinal())
 # cp = URA().getCarparks()

@@ -251,23 +251,19 @@ def read_carparks(skip: int = 0, limit: int = -1, db: Session = Depends(get_data
 
 @app.get("/avail/")
 async def getAvailCP():
-    avails = URA().getAvail()
-    from SVYconverter import SVY21
-
-    return SVY21().convertFromURA(avails)
+    return URA().getAvailFinal()
 
 @app.get("/search/{searchVal}")
 async def getSearchResult(searchVal: str):
     return OneMap().getSearch(searchVal)
 
 @app.get("/nearbyCP/{latLon}/{filterParam}")
-async def getNearbyCP(latLon: str,filterParam: str, db: Session = Depends(get_database_session)):
+async def getNearbyCP(latLon: str, filterParam: str, db: Session = Depends(get_database_session)):
     subjectCoor = latLon.split(',')
     carparks = crud.get_carparks(db = db)
-    # print(carparks)
     withinFiveMin = Filter().getNearby(carparks,subjectCoor)
-    # print(withinFiveMin)
-    return withinFiveMin
+    sorted = Filter().sort(filterParam, withinFiveMin)
+    return sorted
 
 
     
