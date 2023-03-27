@@ -14,15 +14,10 @@ class Carparks(Base):
     id = Column(Integer, primary_key=True, index = True)
     cp_code = Column(Text)
     name = Column(Text)
-<<<<<<< HEAD
     locations = Column(PickleType)
     Rates = Column(PickleType)
-=======
-    locations = Column(JSON)
-    Rates = Column(JSON)
     
     lots = relationship("Lot", back_populates="carpark")
->>>>>>> e846c2a499b6b225e1cfb85975798c4d0cb42659
 
     #BookableSlots = Column(PickleType, nullable = True)
 
