@@ -8,14 +8,17 @@ class Filter():
 
         pass
 
-    def sort(self,type: str, data: list, reverse: bool):
+    def sort(self, toSort: str, data: list, reverse: bool):
         result = []
 
         size = len(data)
 
         for i in data:
             temp = i
-            temp['toSort'] = temp[type]
+            if temp[toSort] == None:
+                temp['toSort'] = -1
+            else:
+                temp['toSort'] = temp[toSort]
             result.append(temp)
         
         self.quickSort(result, 0, size - 1)
