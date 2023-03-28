@@ -16,6 +16,7 @@ from db.schemas.carparkSchema import *
 from db.schemas.userSchema import *
 from db.schemas.lotSchema import *
 from db.schemas.bookingSchema import *
+from db.schemas.favouriteSchema import *
 
 # CARPARKS
 def object_as_dict(obj):
@@ -24,14 +25,15 @@ def object_as_dict(obj):
 
 def get_carparks(db: Session, skip: int = 0, limit: int = -1):
     # print(db.query(model.Carparks).offset(skip).limit(limit).all())
-    if limit > 0:
+    return db.query(model.Carparks).offset(skip).all()
+    '''if limit > 0:
         cp = db.query(model.Carparks).offset(skip).limit(limit).all()
     else:
         cp = db.query(model.Carparks).offset(skip).all()
     cpsAsDict = []
     for temp in cp:
         cpsAsDict.append(object_as_dict(temp))
-    return cpsAsDict
+    return cpsAsDict'''
 
 def get_carpark_by_code(db: Session, cp_code: str):
     return db.query(model.Carparks).filter(model.Carparks.cp_code == cp_code).first()
@@ -109,4 +111,14 @@ def get_bookings(db: Session, skip: int = 0, limit: int = 100):
     return db.query(model.Booking).offset(skip).limit(limit).all()
 
 
-    
+# FAVOURITES
+def create_favourite(db: Session, favourite: FavouriteCreate, user_id, carpark_id):
+    db_favourite = model.Favourite(**favourite.dict(), user_id=user_id, carpark_id=carpark_id)
+    db.add(db_favourite)
+    db.commit()
+    db.refresh(db_favourite)
+    return db_favourite
+
+
+def get_favourites(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(model.Favourite).offset(skip).limit(limit).all()

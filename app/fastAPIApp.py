@@ -331,11 +331,13 @@ if __name__ == "__main__":
 # Booking endpoints
 import db.schemas.bookingSchema as bookingSchema
 import db.schemas.lotSchema as lotSchema
+import db.schemas.favouriteSchema as favouriteSchema
 
 @app.post("/booking/", response_model=bookingSchema.Booking)
-def create_booking(user_id: int, lot_id: int, 
-                   booking: bookingSchema.BookingCreate, db: Session = Depends(get_database_session)):
-    return crud.create_booking(db=db, booking=booking, user_id=user_id, lot_id=lot_id)
+def create_booking(lot_id: int, booking: bookingSchema.BookingCreate, 
+                   db: Session = Depends(get_database_session),
+                   current_user: userSchema.User = Depends(get_current_user)):
+    return crud.create_booking(db=db, booking=booking, user_id=current_user.id, lot_id=lot_id)
 
 
 @app.get("/booking/", response_model=list[bookingSchema.Booking])
@@ -344,10 +346,11 @@ def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_dat
     return booking
 
 
-'''@app.get("/booking/me/", response_model=list[bookingSchema.Booking])
-def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
-    booking = crud.get_bookings(db, skip=skip, limit=limit)
-    return booking'''
+@app.get("/booking/me/", response_model=list[bookingSchema.Booking])
+async def read_bookings_me(current_user: userSchema.User = Depends(get_current_user)):
+    return current_user.bookings
+
+
 
 
 
@@ -362,3 +365,24 @@ def create_lot(carpark_id: int, lot: lotSchema.LotCreate, db: Session = Depends(
 def read_lots(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
     lot = crud.get_lots(db, skip=skip, limit=limit)
     return lot
+
+
+
+
+# Favourite endpoints
+@app.post("/favourite/", response_model=favouriteSchema.Favourite)
+def create_favourite(carpark_id: int, favourite: favouriteSchema.FavouriteCreate,
+                     db: Session = Depends(get_database_session),
+                     current_user: userSchema.User = Depends(get_current_user)):
+    return crud.create_favourite(db=db, favourite=favourite, user_id=current_user.id, carpark_id=carpark_id)
+
+
+@app.get("/favourite/", response_model=list[favouriteSchema.Favourite])
+def read_favourites(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    favourites = crud.get_favourites(db, skip=skip, limit=limit)
+    return favourites
+
+
+@app.get("/favourite/me/", response_model=list[favouriteSchema.Favourite])
+async def read_favourite_me(current_user: userSchema.User = Depends(get_current_user)):
+    return current_user.favourites
