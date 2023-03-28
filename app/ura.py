@@ -20,7 +20,7 @@ class URA:
         r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
                          headers=headers, data={}
                          )
-        print(r.json())
+        # print(r.json())
         result = r.json()['Result']
         # print(r.json()['Result'])
         config().throwData('URA','AccessToken',result)
@@ -117,11 +117,11 @@ class URA:
             newCoor = []
             for j in tempCoor:
                 tempLatLon = [float(k) for k in j['coordinates'].split(',')]
-                print(tempLatLon)
+                # print(tempLatLon)
                 convert = SVY21().computeLatLon(tempLatLon[0],tempLatLon[1])
-                print(convert)
+                # print(convert)
                 newCoor.append({'coordinates':'%s,%s'%(convert[0],convert[1])})
-            print(newCoor)
+            # print(newCoor)
             cp[i]['geometries'] = newCoor
 
         return cp

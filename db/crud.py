@@ -33,6 +33,15 @@ def get_carparks(db: Session, skip: int = 0, limit: int = -1):
         cpsAsDict.append(object_as_dict(temp))
     return cpsAsDict
 
+def get_carpark_by_code(db: Session, cp_code: str):
+    return db.query(model.Carparks).filter(model.Carparks.cp_code == cp_code).first()
+
+def update_carpark(db: Session, filter: str, filterVal, toUpdate: str, newVal):
+    db.query(model.Carparks).\
+       filter(getattr(model.Carparks, filter) == filterVal).\
+       update({toUpdate : newVal})
+    db.commit()
+
 def get_carparks_basic_info(db: Session):
     return db.query(model.Carparks).add_column(Carpark.id).add_column(Carpark.name).all()
 

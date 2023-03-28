@@ -38,6 +38,7 @@ class Carpark(BaseModel):
     locations: Location
     Rates: Rate
     # BookableSlots: Optional[dict] = None
+    Availability: Optional[int] = None
     lots: list[Lot] = []
 
     class Config:

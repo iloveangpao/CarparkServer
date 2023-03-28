@@ -34,50 +34,14 @@ def get_database_session():
 
 # ##daily 
 # # @app.task(daily.at("03:40"))
-# @app.task('every 15 minutes')
-# async def create_carpark():
-#     print('working')
-#     ura = URA()
-#     cp = ura.getCarparks()
-#     temp = cp[0]
-#     r = Rate(
-#         weekdayMin=temp['weekdayMin'],
-#         endTime=temp['endTime'],
-#         weekdayRate=temp['weekdayRate'],
-#         startTime=temp['startTime'],
-#         sunPHRate=temp['sunPHRate'],
-#         sunPHMin=temp['sunPHMin'],
-#         satdayRate=temp['satdayRate'],
-#         satdayMin=temp['satdayMin']
-#     )
-#     print('aftrate')
-    
-#     print(temp)
-#     print(type(temp['geometries']))
-#     print(temp['geometries'])
-#     num = len(temp['geometries'])
-#     print(num)
-#     locations = []
-#     for loc in temp['geometries']:
-#         print(loc)
-#         locations.append(tuple(loc['coordinates'].split(',')))
-#     print(locations)
-#     l = Location(
-#         num = num,
-#         locations = locations
-#     )
-#     print('b4parsing')
-#     # print(cp)
-    
-#     try:
-#         carpark = Carpark(id=0,cp_code = temp['ppCode'], name=temp['ppName'], locations=l, Rates=r, BookableSlots = {})
-#         print('yay',carpark)
-#         db = get_database_session()
-#         crud.create_carpark(db=db, carpark=carpark)
-#         db.close()
-#     except Exception as e:
-#         print(e)
-#     print('hehe')
+@app.task('every 15 seconds')
+async def syncCarparkAvail():
+    avails = URA().getAvail()
+
+    for cp in avails:
+        db = get_database_session()
+        crud.update_carpark(db, 'cp_code', cp['carparkNo'], 'Availability', cp['lotsAvailable'])
+        db.close()
 
 @app.task('every 15 minutes')
 async def add_all_carparks():
@@ -131,5 +95,11 @@ async def add_all_carparks():
             except Exception as e:
                 print(e)
     print('done')
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run()

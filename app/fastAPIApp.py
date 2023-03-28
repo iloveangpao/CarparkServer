@@ -258,13 +258,24 @@ async def getAvailCP():
 async def getSearchResult(searchVal: str):
     return OneMap().getSearch(searchVal)
 
-@app.get("/nearbyCP/{latLon}/{filterParam}")
-async def getNearbyCP(latLon: str, filterParam: str, db: Session = Depends(get_database_session)):
+@app.get("/nearbyCP/{latLon}/{filterParam}/{reverse}")
+async def getNearbyCP(latLon: str, filterParam: str, reverse: str, db: Session = Depends(get_database_session)):
     subjectCoor = latLon.split(',')
-    carparks = crud.get_carparks(db = db)
-    withinFiveMin = Filter().getNearby(carparks,subjectCoor)
-    sorted = Filter().sort(filterParam, withinFiveMin)
-    return sorted
+    if reverse == 'T':
+        decreasing = True
+    elif reverse == 'F':
+        decreasing = False
+    else:
+        raise HTTPException(status_code=500, detail='revese must be T or F')
+    try:
+        carparks = crud.get_carparks(db = db)
+        print(carparks)
+        withinFiveMin = Filter().getNearby(carparks,subjectCoor)
+        sorted = Filter().sort(filterParam, withinFiveMin, decreasing)
+        return sorted
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+    
 
 
     

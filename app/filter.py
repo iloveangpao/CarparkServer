@@ -1,13 +1,14 @@
 from onemap import OneMap
 import copy
 from geopy.distance import geodesic as GD
+from SVYconverter import SVY21
 
 class Filter():
     def __init__(self) -> None:
 
         pass
 
-    def sort(self,type: str, data: list):
+    def sort(self,type: str, data: list, reverse: bool):
         result = []
 
         size = len(data)
@@ -18,24 +19,28 @@ class Filter():
             result.append(temp)
         
         self.quickSort(result, 0, size - 1)
-
+        if reverse:
+            result.reverse()
         print(result)
+        return result
 
     def getNearby(self, data: list, base: list):
-        QUOTA = 300
+        QUOTA = 0.5
         withinFiveMin = []
+        convBase = SVY21().computeLatLon(float(base[0]),float(base[1]))
         for i in data:
-            timeTaken = QUOTA + 1
-            tempXY = i['locations']['locations'][0]
+            # timeTaken = QUOTA + 1
+            tempXY = [float(coor) for coor in i['locations']['locations'][0]]
             
             try:
-                timeTaken = OneMap().getRoute(tempXY,base)['total_time']
-                print(timeTaken)
-                i['total_time'] = timeTaken/60
-                if timeTaken <=  QUOTA:
+                # timeTaken = OneMap().getRoute(tempXY,base)['total_time']
+                # print(timeTaken)
+                # i['total_time'] = timeTaken/60
+                print(GD(convBase,tempXY))
+                if GD(convBase,tempXY) <=  0.5:
                     withinFiveMin.append(i)
-            except:
-                pass
+            except Exception as e:
+                print(e)
             
 
         return withinFiveMin

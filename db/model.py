@@ -16,6 +16,7 @@ class Carparks(Base):
     name = Column(Text)
     locations = Column(PickleType)
     Rates = Column(PickleType)
+    Availability = Column(Integer, nullable = True)
     
     lots = relationship("Lot", back_populates="carpark")
 

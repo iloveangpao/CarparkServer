@@ -30,7 +30,7 @@ class OneMap:
         r = requests.get("https://developers.onemap.sg/commonapi/search",
                          params=params, data={}
                          )
-        print(r.json())
+        # print(r.json())
         result = r.json()['results']
         return result
     
