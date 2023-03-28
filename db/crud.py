@@ -25,15 +25,15 @@ def object_as_dict(obj):
 
 def get_carparks(db: Session, skip: int = 0, limit: int = -1):
     # print(db.query(model.Carparks).offset(skip).limit(limit).all())
-    return db.query(model.Carparks).offset(skip).all()
-    '''if limit > 0:
+    # return db.query(model.Carparks).offset(skip).all()
+    if limit > 0:
         cp = db.query(model.Carparks).offset(skip).limit(limit).all()
     else:
         cp = db.query(model.Carparks).offset(skip).all()
     cpsAsDict = []
     for temp in cp:
         cpsAsDict.append(object_as_dict(temp))
-    return cpsAsDict'''
+    return cpsAsDict
 
 def get_carpark_by_code(db: Session, cp_code: str):
     return db.query(model.Carparks).filter(model.Carparks.cp_code == cp_code).first()
