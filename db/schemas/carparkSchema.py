@@ -36,7 +36,9 @@ class Carpark(BaseModel):
     cp_code : str
     name: str
     locations: Location
-    Rates: Rate
+    # Rates: Rate
+    rate: float
+    min: str
     # BookableSlots: Optional[dict] = None
     Availability: Optional[int] = None
     lots: list[Lot] = []

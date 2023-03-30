@@ -2,19 +2,20 @@ from onemap import OneMap
 import copy
 from geopy.distance import geodesic as GD
 from SVYconverter import SVY21
+from db.schemas.carparkSchema import *
 
 class Filter():
     def __init__(self) -> None:
 
         pass
 
-    def sort(self, toSort: str, data: list, reverse: bool):
+    def sort(self, toSort: str, data: list[Carpark], reverse: bool):
         result = []
 
         size = len(data)
 
         for i in data:
-            temp = i
+            temp = dict(i)
             if temp[toSort] == None:
                 temp['toSort'] = -1
             else:
@@ -27,13 +28,14 @@ class Filter():
         print(result)
         return result
 
-    def getNearby(self, data: list, base: list):
+    def getNearby(self, data: list[Carpark], base: list):
         QUOTA = 0.5
         withinFiveMin = []
         convBase = SVY21().computeLatLon(float(base[0]),float(base[1]))
         for i in data:
+            temp = dict(i)
             # timeTaken = QUOTA + 1
-            tempXY = [float(coor) for coor in i['locations']['locations'][0]]
+            tempXY = [float(coor) for coor in dict(temp['locations'])['locations'][0]]
             
             try:
                 # timeTaken = OneMap().getRoute(tempXY,base)['total_time']
@@ -90,11 +92,5 @@ class Filter():
         return i + 1
 
 
-
-
- 
-# from ura import URA
-# cp = URA().getCarparks()
-# Filter().sort('weekdayRate',cp)
 
 

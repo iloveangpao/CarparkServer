@@ -3,6 +3,7 @@ from parsers import config
 import datetime
 import time
 import re
+from dateutil import tz
 from SVYconverter import SVY21
 
 class URA:
@@ -50,6 +51,68 @@ class URA:
                          )
         return r.json()['Result']
 
+    def datingCP(self,cp = None):
+        now = datetime.datetime.now()
+
+        # Hardcode zones:
+        from_zone = tz.tzutc()
+        to_zone = tz.gettz('Asia/Singapore')
+
+        utc = now
+
+        # Tell the datetime object that it's in UTC time zone since 
+        # datetime objects are 'naive' by default
+        utc = utc.replace(tzinfo=from_zone)
+
+        # Convert time zone
+        timeInSg = utc.astimezone(to_zone)
+
+        dayOfWeek = timeInSg.date().weekday()
+    
+        newCP = []
+        for i in cp:
+            temp = i
+            rate = 0
+            min = ''
+            if dayOfWeek < 5:
+                rate = i['weekdayRate']
+                min = i['weekdayMin']
+                del temp['weekdayRate']
+                del temp['weekdayMin']
+                del temp['satdayMin']
+                del temp['satdayRate']
+                del temp['sunPHMin']
+                del temp['sunPHRate']
+            elif dayOfWeek == 6:
+                rate = i['sunPHMin']
+                min = i['sunPHRate']
+                del temp['weekdayRate']
+                del temp['weekdayMin']
+                del temp['satdayMin']
+                del temp['satdayRate']
+                del temp['sunPHMin']
+                del temp['sunPHRate']
+            else:
+                rate = i['satdayRate']
+                min = i['satdayMin']
+                del temp['weekdayRate']
+                del temp['weekdayMin']
+                del temp['satdayMin']
+                del temp['satdayRate']
+                del temp['sunPHMin']
+                del temp['sunPHRate']
+
+            temp['rate'] = rate
+            temp['min'] = min
+            newCP.append(temp)
+
+        return newCP
+            
+
+            
+
+
+        
     def defCPAftTiming(self, cp):
         # print('into timing')
         gmt_time = time.gmtime()
@@ -130,39 +193,7 @@ class URA:
         cp = self.getAvail()
         return self.convertToLatLon(cp)
 
-# print(URA().getCPFinal())
-# cp = URA().getCarparks()
-# import datetime
-# import time
-# import re
-# gmt_time = time.gmtime()
-
-# print(gmt_time)
-# gmt_time_to_dt = datetime.datetime.fromtimestamp(time.mktime(gmt_time))
-
-# gmt_plus = gmt_time_to_dt + datetime.timedelta(minutes = 480)
-# print(gmt_plus.time())
-
-# result = []
-
-# for i in cp:
-#     startWS = re.search('\s',i['startTime']).span()
-#     startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
-#     convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
-
-#     endWS = re.search('\s',i['endTime']).span()
-#     endTime = startTime = '%s.00 %s'%(i['endTime'][:startWS[0]] , i['endTime'][startWS[1]:])
-#     convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
-#     print(convertedStart,convertedEnd)
-
-#     if convertedStart <= gmt_plus.time() <= convertedEnd or convertedEnd < convertedStart and (convertedStart<gmt_plus.time() or convertedEnd > gmt_plus.time()):
-#         result.append(i)
-
-# print(result)
-
-
-# weekday = gmt_plus.date().weekday() < 5
-# print(weekday)
 
 
 
+print(URA().datingCP(URA().getCPFinal()))

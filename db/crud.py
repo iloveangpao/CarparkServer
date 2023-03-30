@@ -25,15 +25,16 @@ def object_as_dict(obj):
 
 def get_carparks(db: Session, skip: int = 0, limit: int = -1):
     # print(db.query(model.Carparks).offset(skip).limit(limit).all())
-    # return db.query(model.Carparks).offset(skip).all()
     if limit > 0:
-        cp = db.query(model.Carparks).offset(skip).limit(limit).all()
+        query = db.query(model.Carparks).offset(skip).limit(limit).all()
     else:
-        cp = db.query(model.Carparks).offset(skip).all()
-    cpsAsDict = []
-    for temp in cp:
-        cpsAsDict.append(object_as_dict(temp))
-    return cpsAsDict
+        query = db.query(model.Carparks).offset(skip).all()
+    
+    carparkList = []
+    for i in query:
+        carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Availability = i.Availability, rate = i.rate, min = i.min, lots = i.lots))
+    
+    return carparkList
 
 def get_carpark_by_code(db: Session, cp_code: str):
     return db.query(model.Carparks).filter(model.Carparks.cp_code == cp_code).first()
@@ -48,18 +49,31 @@ def get_carparks_basic_info(db: Session):
     return db.query(model.Carparks).add_column(Carpark.id).add_column(Carpark.name).all()
 
 
-def create_carpark(db: Session, carpark: Carpark):
-    # print(carpark.locations)
-    try:
-        db_carpark = model.Carparks(name=carpark.name, cp_code = carpark.cp_code,
-                                locations=carpark.locations.dict(), Rates=carpark.Rates.dict())
-        db.add(db_carpark)
-        db.commit()
-        db.refresh(db_carpark)
-    except Exception as e:
-        print(e)
+def create_carpark(db: Session, cp: dict):
+    for carparkData in cp:
+        if carparkData['vehCat'] == "Car":
+            try:
+                num = len(carparkData['geometries'])
+                locations = []
+                for loc in carparkData['geometries']:
+                    locations.append(tuple(loc['coordinates'].split(',')))
+                l = Location(
+                    num = num,
+                    locations = locations
+                )
+                carpark = Carpark(id=0,cp_code = carparkData['ppCode'], name=carparkData['ppName'], locations=l, rate=carparkData['rate'], min = carparkData['min'])
+                db_carpark = model.Carparks(name=carpark.name, cp_code = carpark.cp_code,
+                                locations=carpark.locations.dict(), rate=carpark.rate, min = carpark.min)
+                db.add(db_carpark)
+                db.commit()
+                db.refresh(db_carpark)
+            except Exception as e:
+                print(e)
 
-
+def del_all_carparks(db: Session):
+    deleted = db.query(model.Carparks).delete()
+    db.commit()
+    print(str(deleted) + " rows were deleted")
 # USERS
 def get_user(db: Session, user_id: int):
     return db.query(model.User).filter(model.User.id == user_id).first()
@@ -86,8 +100,8 @@ def create_user(db: Session, user: UserCreate, hashed_password):
 
 
 # LOTS
-def create_lot(db: Session, lot: LotCreate, carpark_id: int):
-    db_lot = model.Lot(**lot.dict(), carpark_id=carpark_id)
+def create_lot(db: Session, lot: LotCreate, cp_code: str):
+    db_lot = model.Lot(**lot.dict(), cp_code=cp_code)
     db.add(db_lot)
     db.commit()
     db.refresh(db_lot)

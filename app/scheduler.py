@@ -47,53 +47,16 @@ async def syncCarparkAvail():
 async def add_all_carparks():
     print('working')
     try:
-        ura = URA()
-        cp = ura.getCPFinal()
+        cp = URA().datingCP(URA().getCPFinal())
         db = get_database_session()
-        deleted = db.query(model.Carparks).delete()
-        db.commit()
+        crud.del_all_carparks(db)
         db.close()
-        print(str(deleted) + " rows were deleted")
         db = get_database_session()
-        # print(crud.get_carparks(db,0,100))
+        crud.create_carpark(db,cp)
         db.close()
     except Exception as e:
         print(e)
-    print('putting in')
-
-    for carpark in cp:
-        if carpark['ppName'] == 'YISHUN INDUSTRIAL PARK A':
-            print('fount', carpark, carpark['vehCat'] == "Car")
-        if carpark['vehCat'] == "Car":
-            if carpark['ppName'] == 'YISHUN INDUSTRIAL PARK A':
-                print('yay')
-            try:
-                r = Rate(
-                    weekdayMin=carpark['weekdayMin'],
-                    endTime=carpark['endTime'],
-                    weekdayRate=carpark['weekdayRate'],
-                    startTime=carpark['startTime'],
-                    sunPHRate=carpark['sunPHRate'],
-                    sunPHMin=carpark['sunPHMin'],
-                    satdayRate=carpark['satdayRate'],
-                    satdayMin=carpark['satdayMin']
-                )
-                
-                num = len(carpark['geometries'])
-                locations = []
-                for loc in carpark['geometries']:
-                    locations.append(tuple(loc['coordinates'].split(',')))
-                l = Location(
-                    num = num,
-                    locations = locations
-                )
-                carpark = Carpark(id=0,cp_code = carpark['ppCode'], name=carpark['ppName'], locations=l, Rates=r, BookableSlots = {})
-
-                db = get_database_session()
-                crud.create_carpark(db=db, carpark=carpark)
-                db.close()
-            except Exception as e:
-                print(e)
+    
     print('done')
 
 

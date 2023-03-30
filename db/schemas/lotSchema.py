@@ -11,6 +11,6 @@ class LotCreate(LotBase):
 
 class Lot(LotBase):
     id: int
-    carpark_id: int
+    cp_code: str
     class Config:
         orm_mode = True

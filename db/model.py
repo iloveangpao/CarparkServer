@@ -1,6 +1,6 @@
 from sqlalchemy.schema import Column
 from typing import List
-from sqlalchemy.types import String, Integer, Text, JSON, Boolean, ARRAY, PickleType, DateTime
+from sqlalchemy.types import String, Integer, Text, JSON, Boolean, ARRAY, PickleType, DateTime, Float
 from sqlalchemy.dialects.mysql import MEDIUMTEXT, VARCHAR
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -11,11 +11,14 @@ from datetime import datetime
 
 class Carparks(Base):
     __tablename__ = "carparks"
-    id = Column(Integer, primary_key=True, index = True)
-    cp_code = Column(Text)
+    id = Column(Integer, index = True)
+    cp_code = Column(Text, primary_key=True)
     name = Column(Text)
     locations = Column(PickleType)
-    Rates = Column(PickleType)
+    # Rates = Column(PickleType)
+    rate = Column(Float)
+    min = Column(Text)
+
     Availability = Column(Integer, nullable = True)
     
 
@@ -41,7 +44,7 @@ class Lot(Base):
     __tablename__ = "lots"
 
     id = Column(Integer, primary_key=True, index=True)
-    carpark_id = Column(Integer, ForeignKey("carparks.id"))
+    cp_code = Column(Integer, ForeignKey("carparks.cp_code"))
 
     carpark = relationship("Carparks", back_populates="lots")
     bookings = relationship("Booking", back_populates="lot")
