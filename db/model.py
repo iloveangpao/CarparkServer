@@ -12,7 +12,7 @@ from datetime import datetime
 class Carparks(Base):
     __tablename__ = "carparks"
     id = Column(Integer, index = True)
-    cp_code = Column(Text, primary_key=True)
+    cp_code = Column(Text(255), primary_key=True)
     name = Column(Text)
     locations = Column(PickleType)
     # Rates = Column(PickleType)
