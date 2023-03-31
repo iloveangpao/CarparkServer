@@ -17,6 +17,14 @@ from db.schemas.userSchema import *
 from db.schemas.lotSchema import *
 from db.schemas.bookingSchema import *
 from db.schemas.favouriteSchema import *
+import importlib
+
+cls = "somemodule.Test"
+module_name, class_name = cls.split(".")
+
+somemodule = importlib.import_module(module_name)
+
+print(getattr(somemodule, class_name))
 
 # CARPARKS
 def object_as_dict(obj):
@@ -108,8 +116,18 @@ def create_lot(db: Session, lot: LotCreate, cp_code: str):
     return db_lot
 
 
-def get_lots(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(model.Lot).offset(skip).limit(limit).all()
+def get_lots(db: Session, skip: int = 0, limit: int = -1):
+    if limit > 0:
+        query = db.query(model.Carparks).offset(skip).limit(limit).all()
+    else:
+        query = db.query(model.Carparks).offset(skip).all()
+
+    return query
+
+def get_lot_by_attr(db: Session, attribute : str, searchVal):
+    return db.query(model.Lot).filter(getattr(model.Lot,attribute) == searchVal).first()
+
+
 
 
 # BOOKINGS
@@ -124,6 +142,9 @@ def create_booking(db: Session, booking: BookingCreate, user_id: int, lot_id: in
 def get_bookings(db: Session, skip: int = 0, limit: int = 100):
     return db.query(model.Booking).offset(skip).limit(limit).all()
 
+def get_booking_by_attr(db: Session, attribute : str, searchVal):
+    return db.query(model.Booking).filter(getattr(model.Booking,attribute) == searchVal).first()
+
 
 # FAVOURITES
 def create_favourite(db: Session, favourite: FavouriteCreate, user_id, carpark_id):
@@ -136,3 +157,6 @@ def create_favourite(db: Session, favourite: FavouriteCreate, user_id, carpark_i
 
 def get_favourites(db: Session, skip: int = 0, limit: int = 100):
     return db.query(model.Favourite).offset(skip).limit(limit).all()
+
+def get_favourites_by_attr(db: Session, attribute : str, searchVal):
+    return db.query(model.Favourite).filter(getattr(model.Favourite,attribute) == searchVal).first()

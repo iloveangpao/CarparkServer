@@ -363,6 +363,11 @@ def read_lots(skip: int = 0, limit: int = 100, db: Session = Depends(get_databas
     return lot
 
 
+# @app.get("/lot_by_id/", response_model=list[lotSchema.Lot])
+# def read_lots(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+#     lot = crud.get_lots(db, skip=skip, limit=limit)
+#     return lot
+
 
 
 # Favourite endpoints
