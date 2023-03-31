@@ -32,7 +32,7 @@ class CarparkCreate(CarparkBase):
 
 
 class Carpark(BaseModel):
-    id: int
+    id: Optional[int]
     cp_code : str
     name: str
     locations: Location

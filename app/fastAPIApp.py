@@ -353,8 +353,8 @@ async def read_bookings_me(current_user: userSchema.User = Depends(get_current_u
 
 # Lot endpoints
 @app.post("/lot/", response_model=lotSchema.Lot)
-def create_lot(carpark_id: int, lot: lotSchema.LotCreate, db: Session = Depends(get_database_session)):
-    return crud.create_lot(db=db, lot=lot, carpark_id=carpark_id)
+def create_lot(cp_code: str, lot: lotSchema.LotCreate, db: Session = Depends(get_database_session)):
+    return crud.create_lot(db=db, lot=lot, cp_code=cp_code)
 
 
 @app.get("/lot/", response_model=list[lotSchema.Lot])

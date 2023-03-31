@@ -137,35 +137,52 @@ class URA:
         newCP = []
         count = 0
         for i in cp:
-            newCP.append(i)
+            if i['vehCat'] == 'Car':
+                newCP.append(i)
 
-            wdRate = i['weekdayRate']
-            sunPHRate = i['sunPHRate']
-            satdayRate = i['satdayRate']
-            newWDRate = float(wdRate[1:])
-            newSunPHRate = float(sunPHRate[1:])
-            newSatDayRate = float(satdayRate[1:])
-            
-            newCP[count]['weekdayRate'] = newWDRate
-            newCP[count]['sunPHRate'] = newSunPHRate
-            newCP[count]['satdayRate'] = newSatDayRate
+                wdRate = i['weekdayRate']
+                sunPHRate = i['sunPHRate']
+                satdayRate = i['satdayRate']
+                newWDRate = float(wdRate[1:])
+                newSunPHRate = float(sunPHRate[1:])
+                newSatDayRate = float(satdayRate[1:])
+                
+                newCP[count]['weekdayRate'] = newWDRate
+                newCP[count]['sunPHRate'] = newSunPHRate
+                newCP[count]['satdayRate'] = newSatDayRate
 
-            startWS = re.search('\s',i['startTime']).span()
-            startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
-            convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
+                startWS = re.search('\s',i['startTime']).span()
+                startTime = '%s.00 %s'%(i['startTime'][:startWS[0]] , i['startTime'][startWS[1]:])
+                convertedStart = datetime.datetime.strptime(startTime, '%I.%M.%S %p').time()
 
-            endWS = re.search('\s',i['endTime']).span()
-            endTime = '%s.00 %s'%(i['endTime'][:endWS[0]] , i['endTime'][endWS[1]:])
-            convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
+                endWS = re.search('\s',i['endTime']).span()
+                endTime = '%s.00 %s'%(i['endTime'][:endWS[0]] , i['endTime'][endWS[1]:])
+                convertedEnd = datetime.datetime.strptime(endTime, '%I.%M.%S %p').time()
 
-            newCP[count]['startTime'] = convertedStart
-            newCP[count]['endTime'] = convertedEnd
+                newCP[count]['startTime'] = convertedStart
+                newCP[count]['endTime'] = convertedEnd
+                newCP[count]['altRate'] = []
 
-            count += 1
+                count += 1
 
         return newCP
 
+    def handleExtraRates(self,cp):
+        seen = ''
+        newCP = []
+        count = -1
+        # toggle = True
+        for i in cp:
+            if i['ppCode'] == seen:
+                newCP[count]['altRate'].append({'rate' : i['rate'], 'min' : i['min']})
+                # toggle = True
+            else:
+                count += 1
+                newCP.append(i)
+                seen = i['ppCode']
 
+        return newCP
+    
     def getCPFinal(self):
         # print('test 1')
         cp = self.getCarparks()
@@ -196,4 +213,4 @@ class URA:
 
 
 
-print(URA().datingCP(URA().getCPFinal()))
+print(URA().handleExtraRates(URA().datingCP(URA().getCPFinal())))

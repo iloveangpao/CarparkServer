@@ -47,7 +47,7 @@ async def syncCarparkAvail():
 async def add_all_carparks():
     print('working')
     try:
-        cp = URA().datingCP(URA().getCPFinal())
+        cp = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
         db = get_database_session()
         crud.del_all_carparks(db)
         db.close()

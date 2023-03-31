@@ -32,7 +32,7 @@ def get_carparks(db: Session, skip: int = 0, limit: int = -1):
     
     carparkList = []
     for i in query:
-        carparkList.append(Carpark(id = i.id, cp_code = i.cp_code, name = i.name, locations = i.locations, Availability = i.Availability, rate = i.rate, min = i.min, lots = i.lots))
+        carparkList.append(Carpark(cp_code = i.cp_code, name = i.name, locations = i.locations, Availability = i.Availability, rate = i.rate, min = i.min, lots = i.lots))
     
     return carparkList
 
