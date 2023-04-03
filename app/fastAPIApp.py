@@ -351,6 +351,30 @@ async def read_bookings_me(current_user: userSchema.User = Depends(get_current_u
 
 
 
+# Favourite endpoints
+@app.post("/favourite/", response_model=favouriteSchema.Favourite)
+def create_favourite(cp_code: str, favourite: favouriteSchema.FavouriteCreate,
+                     db: Session = Depends(get_database_session),
+                     current_user: userSchema.User = Depends(get_current_user)):
+    return crud.create_favourite(db=db, favourite=favourite, 
+                                 user_id=current_user.id, cp_code=cp_code)
+
+
+@app.get("/favourite/", response_model=list[favouriteSchema.Favourite])
+def read_favourites(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
+    favourites = crud.get_favourites(db, skip=skip, limit=limit)
+    return favourites
+
+
+@app.get("/favourite/me/", response_model=list[favouriteSchema.Favourite])
+async def read_favourite_me(current_user: userSchema.User = Depends(get_current_user)):
+    return current_user.favourites
+
+
+
+
+
+
 # Lot endpoints
 @app.post("/lot/", response_model=lotSchema.Lot)
 def create_lot(cp_code: str, lot: lotSchema.LotCreate, db: Session = Depends(get_database_session)):
@@ -368,22 +392,3 @@ def read_lots(skip: int = 0, limit: int = 100, db: Session = Depends(get_databas
 #     lot = crud.get_lots(db, skip=skip, limit=limit)
 #     return lot
 
-
-
-# Favourite endpoints
-@app.post("/favourite/", response_model=favouriteSchema.Favourite)
-def create_favourite(carpark_id: int, favourite: favouriteSchema.FavouriteCreate,
-                     db: Session = Depends(get_database_session),
-                     current_user: userSchema.User = Depends(get_current_user)):
-    return crud.create_favourite(db=db, favourite=favourite, user_id=current_user.id, carpark_id=carpark_id)
-
-
-@app.get("/favourite/", response_model=list[favouriteSchema.Favourite])
-def read_favourites(skip: int = 0, limit: int = 100, db: Session = Depends(get_database_session)):
-    favourites = crud.get_favourites(db, skip=skip, limit=limit)
-    return favourites
-
-
-@app.get("/favourite/me/", response_model=list[favouriteSchema.Favourite])
-async def read_favourite_me(current_user: userSchema.User = Depends(get_current_user)):
-    return current_user.favourites

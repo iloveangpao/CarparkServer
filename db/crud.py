@@ -142,8 +142,8 @@ def get_booking_by_attr(db: Session, attribute : str, searchVal):
 
 
 # FAVOURITES
-def create_favourite(db: Session, favourite: FavouriteCreate, user_id, carpark_id):
-    db_favourite = model.Favourite(**favourite.dict(), user_id=user_id, carpark_id=carpark_id)
+def create_favourite(db: Session, favourite: FavouriteCreate, user_id: int, cp_code: str):
+    db_favourite = model.Favourite(**favourite.dict(), user_id=user_id, cp_code=cp_code)
     db.add(db_favourite)
     db.commit()
     db.refresh(db_favourite)

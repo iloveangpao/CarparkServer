@@ -12,6 +12,6 @@ class FavouriteCreate(FavouriteBase):
 class Favourite(FavouriteBase):
     id: int
     user_id: int
-    carpark_id: int
+    cp_code: str
     class Config:
         orm_mode = True

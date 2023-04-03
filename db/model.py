@@ -66,7 +66,7 @@ class Favourite(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    carpark_id = Column(Integer, ForeignKey("carparks.id"))
+    cp_code = Column(String(5), ForeignKey("carparks.cp_code"))
 
     user = relationship("User", back_populates="favourites")
     carpark = relationship("Carparks", back_populates="favourites")
