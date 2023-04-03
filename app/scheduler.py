@@ -23,7 +23,9 @@ def get_database_session():
 
 
 masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
-dbList = crud.get_carparks()
+db = get_database_session()
+dbList = crud.get_carparks(db)
+db.close()
 cpCodeList = []
 for i in dbList:
     cpCodeList.append(i.cp_code)
