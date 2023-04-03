@@ -4,7 +4,6 @@ from datetime import datetime
 
 class BookingBase(BaseModel):
     start_time: datetime # or SQLAlchemy DateTime
-    end_time: datetime
     
 
 class BookingCreate(BookingBase):
