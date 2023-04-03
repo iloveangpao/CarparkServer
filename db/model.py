@@ -12,7 +12,7 @@ from datetime import datetime
 class Carparks(Base):
     __tablename__ = "carparks"
     id = Column(Integer, index = True, autoincrement=True)
-    cp_code = Column(VARCHAR(128), primary_key=True)
+    cp_code = Column(String(5), primary_key=True, index=True)
     name = Column(Text)
     locations = Column(PickleType)
     # Rates = Column(PickleType)
@@ -44,7 +44,7 @@ class Lot(Base):
     __tablename__ = "lots"
 
     id = Column(Integer, primary_key=True, index=True)
-    cp_code = Column(VARCHAR(128), ForeignKey("carparks.cp_code"))
+    cp_code = Column(str(4), ForeignKey("carparks.cp_code"))
 
     carpark = relationship("Carparks", back_populates="lots")
     bookings = relationship("Booking", back_populates="lot")

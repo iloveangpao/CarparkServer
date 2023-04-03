@@ -4,6 +4,7 @@ from datetime import datetime
 
 class BookingBase(BaseModel):
     start_time: str # or SQLAlchemy DateTime
+    lot_id: int
     
 
 class BookingCreate(BookingBase):
@@ -13,6 +14,6 @@ class BookingCreate(BookingBase):
 class Booking(BookingBase):
     id: int
     user_id: int
-    lot_id: int
+    
     class Config:
         orm_mode = True

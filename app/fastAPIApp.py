@@ -330,11 +330,10 @@ import db.schemas.lotSchema as lotSchema
 import db.schemas.favouriteSchema as favouriteSchema
 
 @app.post("/booking/", response_model=bookingSchema.Booking)
-def create_booking(lot_id: int, booking: bookingSchema.BookingCreate, start_time: str,
+def create_booking(booking: bookingSchema.BookingCreate,
                    db: Session = Depends(get_database_session),
                    current_user: userSchema.User = Depends(get_current_user)):
-    return crud.create_booking(db=db, booking=booking, user_id=current_user.id,
-                                lot_id=lot_id, start_time=start_time)
+    return crud.create_booking(db=db, booking=booking, user_id=current_user.id)
 
 
 @app.get("/booking/", response_model=list[bookingSchema.Booking])

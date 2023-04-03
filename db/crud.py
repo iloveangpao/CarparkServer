@@ -113,9 +113,9 @@ def create_lot(db: Session, lot: LotCreate, cp_code: str):
 
 def get_lots(db: Session, skip: int = 0, limit: int = -1):
     if limit > 0:
-        query = db.query(model.Carparks).offset(skip).limit(limit).all()
+        query = db.query(model.Lot).offset(skip).limit(limit).all()
     else:
-        query = db.query(model.Carparks).offset(skip).all()
+        query = db.query(model.Lot).offset(skip).all()
 
     return query
 
@@ -126,8 +126,8 @@ def get_lot_by_attr(db: Session, attribute : str, searchVal):
 
 
 # BOOKINGS
-def create_booking(db: Session, booking: BookingCreate, user_id: int, lot_id: int, start_time: str):
-    db_booking = model.Booking(**booking.dict(), user_id=user_id, lot_id=lot_id, start_time=start_time)
+def create_booking(db: Session, booking: BookingCreate, user_id: int):
+    db_booking = model.Booking(**booking.dict(), user_id=user_id)
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
