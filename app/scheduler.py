@@ -2,17 +2,6 @@
 import asyncio
 from rocketry import Rocketry
 from rocketry.conds import every, daily
-app = Rocketry(execution="async")
-
-
-# Create some tasks
-
-# @app.task('every 5 seconds')
-# async def do_things():
-#     print('hello')
-#     "This runs for short time"
-#     await asyncio.sleep(1)
-
 from app.ura import URA
 
 import db.crud as crud
@@ -32,8 +21,13 @@ def get_database_session():
     finally:
         db.close()
 
-# ##daily 
-# # @app.task(daily.at("03:40"))
+masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
+db = get_database_session()
+crud.create_carpark(db,masterList)
+db.close()
+
+app = Rocketry(execution="async")
+
 @app.task('every 15 seconds')
 async def syncCarparkAvail():
     avails = URA().getAvail()
@@ -48,21 +42,18 @@ async def add_all_carparks():
     print('working')
     try:
         cp = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
-        db = get_database_session()
-        crud.del_all_carparks(db)
-        db.close()
-        db = get_database_session()
-        crud.create_carpark(db,cp)
-        db.close()
+        for carpark in cp:
+            db = get_database_session()
+            crud.update_carpark(db, 'cp_code', carpark['carparkNo'], 'rate', carpark['min'])
+            db.close()
+            db = get_database_session()
+            crud.update_carpark(db, 'cp_code', carpark['carparkNo'], 'min', carpark['min'])
+            db.close()
+            
     except Exception as e:
         print(e)
     
     print('done')
-
-
-
-
-
 
 if __name__ == "__main__":
     app.run()

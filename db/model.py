@@ -31,7 +31,7 @@ class Carparks(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     username = Column(String(50), unique=True, index=True)
     email = Column(String(50), unique=True, index=True)
     hashed_password = Column(String(64))
@@ -43,8 +43,8 @@ class User(Base):
 class Lot(Base):
     __tablename__ = "lots"
 
-    id = Column(Integer, primary_key=True, index=True)
-    cp_code = Column(str(4), ForeignKey("carparks.cp_code"))
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    cp_code = Column(String(5), ForeignKey("carparks.cp_code"))
 
     carpark = relationship("Carparks", back_populates="lots")
     bookings = relationship("Booking", back_populates="lot")
@@ -53,7 +53,7 @@ class Lot(Base):
 class Booking(Base):
     __tablename__ = "bookings"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     start_time = Column(String(30), index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     lot_id = Column(Integer, ForeignKey("lots.id"))
@@ -61,9 +61,19 @@ class Booking(Base):
     user = relationship("User", back_populates="bookings")
     lot = relationship("Lot", back_populates="bookings")
     
-class Favourite(Base):
+'''class Favourite(Base):
     __tablename__ = "favourites"
 
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    cp_code = Column(String(5), ForeignKey("carparks.cp_code"))
+
+    user = relationship("User", back_populates="favourites")
+    carpark = relationship("Carparks", back_populates="favourites")'''
+
+
+class Favourite(Base):
+    __tablename__ = "favourites"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     cp_code = Column(String(5), ForeignKey("carparks.cp_code"))
