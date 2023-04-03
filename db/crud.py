@@ -126,8 +126,8 @@ def get_lot_by_attr(db: Session, attribute : str, searchVal):
 
 
 # BOOKINGS
-def create_booking(db: Session, booking: BookingCreate, user_id: int, lot_id: int):
-    db_booking = model.Booking(**booking.dict(), user_id=user_id, lot_id=lot_id)
+def create_booking(db: Session, booking: BookingCreate, user_id: int, lot_id: int, start_time: datetime):
+    db_booking = model.Booking(**booking.dict(), user_id=user_id, lot_id=lot_id, start_time=start_time)
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
