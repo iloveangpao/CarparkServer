@@ -31,6 +31,7 @@ for i in dbList:
     cpCodeList.append(i.cp_code)
 toInsert = []
 for j in masterList:
+    print(j)
     if j['carparkNo'] in cpCodeList:
         toInsert.append(j)
 db = get_database_session()
