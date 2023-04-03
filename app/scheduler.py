@@ -32,7 +32,7 @@ for i in dbList:
 toInsert = []
 for j in masterList:
     print(j)
-    if j['carparkNo'] in cpCodeList:
+    if j['ppCode'] in cpCodeList:
         toInsert.append(j)
 db = get_database_session()
 crud.create_carpark(db,toInsert)
@@ -46,7 +46,7 @@ async def syncCarparkAvail():
 
     for cp in avails:
         db = get_database_session()
-        crud.update_carpark(db, 'cp_code', cp['carparkNo'], 'Availability', cp['lotsAvailable'])
+        crud.update_carpark(db, 'cp_code', cp['ppCode'], 'Availability', cp['lotsAvailable'])
         db.close()
 
 @app.task('every 15 minutes')
@@ -56,10 +56,10 @@ async def add_all_carparks():
         cp = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
         for carpark in cp:
             db = get_database_session()
-            crud.update_carpark(db, 'cp_code', carpark['carparkNo'], 'rate', carpark['min'])
+            crud.update_carpark(db, 'cp_code', carpark['ppCode'], 'rate', carpark['min'])
             db.close()
             db = get_database_session()
-            crud.update_carpark(db, 'cp_code', carpark['carparkNo'], 'min', carpark['min'])
+            crud.update_carpark(db, 'cp_code', carpark['ppCode'], 'min', carpark['min'])
             db.close()
             
     except Exception as e:
