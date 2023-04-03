@@ -23,7 +23,6 @@ class Carparks(Base):
     
 
     lots = relationship("Lot", back_populates="carpark")
-    favourites = relationship("Favourite", back_populates="carpark")
 
     #BookableSlots = Column(PickleType, nullable = True)
 
@@ -43,8 +42,8 @@ class User(Base):
 class Lot(Base):
     __tablename__ = "lots"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    cp_code = Column(String(5), ForeignKey("carparks.cp_code"))
+    id = Column(Integer, primary_key=True, index=True)
+    cp_code = Column(str(4), ForeignKey("carparks.cp_code"))
 
     carpark = relationship("Carparks", back_populates="lots")
     bookings = relationship("Booking", back_populates="lot")
