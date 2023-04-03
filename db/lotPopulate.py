@@ -1,5 +1,6 @@
+import sys
+sys.path.append('/code/')
 from crud import *
-
 from database import SessionLocal, engine
 import model as model
 from sqlalchemy.orm import Session
