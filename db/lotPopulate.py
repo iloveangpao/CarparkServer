@@ -1,14 +1,12 @@
 import sys
 sys.path.append('/code/')
 from crud import *
-from database import SessionLocal, engine
+from database import SessionLocal
 import model as model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.lotSchema import *
-
-model.Base.metadata.create_all(bind=engine)
 
 def get_database_session():
     try:

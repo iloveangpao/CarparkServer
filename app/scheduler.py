@@ -21,9 +21,18 @@ def get_database_session():
     finally:
         db.close()
 
+
 masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
+dbList = crud.get_carparks()
+cpCodeList = []
+for i in dbList:
+    cpCodeList.append(i.cp_code)
+toInsert = []
+for j in masterList:
+    if j['carparkNo'] in cpCodeList:
+        toInsert.append(j)
 db = get_database_session()
-crud.create_carpark(db,masterList)
+crud.create_carpark(db,toInsert)
 db.close()
 
 app = Rocketry(execution="async")
