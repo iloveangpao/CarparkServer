@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class BookingBase(BaseModel):
-    start_time: datetime # or SQLAlchemy DateTime
+    start_time: str # or SQLAlchemy DateTime
     
 
 class BookingCreate(BookingBase):

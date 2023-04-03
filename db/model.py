@@ -54,7 +54,7 @@ class Booking(Base):
     __tablename__ = "bookings"
 
     id = Column(Integer, primary_key=True, index=True)
-    start_time = Column(DateTime, index=True)
+    start_time = Column(str, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     lot_id = Column(Integer, ForeignKey("lots.id"))
 
