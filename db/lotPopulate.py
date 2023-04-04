@@ -18,8 +18,9 @@ db = get_database_session()
 cp = get_carparks(db)
 db.close()
 for carpark in cp:
-    lot = LotCreate()
-    db = get_database_session()
-    create_lot(db, lot, carpark.cp_code)
-    db.close()
+    for i in range(6):
+        lot = LotCreate()
+        db = get_database_session()
+        create_lot(db, lot, carpark.cp_code)
+        db.close()
 
