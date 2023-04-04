@@ -2,7 +2,6 @@ import sys
 sys.path.append('/code/')
 from crud import *
 from database import SessionLocal
-import model as model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
