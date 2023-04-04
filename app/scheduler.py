@@ -56,7 +56,7 @@ async def add_all_carparks():
         cp = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
         for carpark in cp:
             db = get_database_session()
-            crud.update_carpark(db, 'cp_code', carpark['ppCode'], 'rate', carpark['min'])
+            crud.update_carpark(db, 'cp_code', carpark['ppCode'], 'rate', carpark['rate'])
             db.close()
             db = get_database_session()
             crud.update_carpark(db, 'cp_code', carpark['ppCode'], 'min', carpark['min'])
