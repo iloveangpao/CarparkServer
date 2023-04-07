@@ -169,6 +169,10 @@ def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
+    if len(user.username) < 3:
+        raise HTTPException(status_code=400, detail="Username too short")
+    if len(user.username) > 20:
+        raise HTTPException(status_code=400, detail="Username too long")
     if not user.username:
         raise HTTPException(status_code=400, detail="Please key in a username")
     
@@ -184,9 +188,19 @@ def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_
     # password validation
     if len(user.password) < 8:
         raise HTTPException(status_code=400, detail="Password too short")
+    if len(user.password) > 20:
+        raise HTTPException(status_code=400, detail="Password too long")
+    # if user.password.upper() == user.password:
+    #     raise HTTPException(status_code=400, detail="Password must include lowercase letters")
+    # if user.password.lower() == user.password:
+    #     raise HTTPException(status_code=400, detail="Password must include uppercase letters")
+    # if user.password.isalnum():
+    #     raise HTTPException(status_code=400, detail="Password must have symbols")
+    # if user.password.isalpha():
+    #     raise HTTPException(status_code=400, detail="Password must have numbers")
     if not user.password:
         raise HTTPException(status_code=400, detail="Please key in a password")
-    
+
     hashed_password = get_password_hash(user.password)
     return crud.create_user(db=db, user=user, hashed_password=hashed_password)
 
@@ -209,7 +223,7 @@ def read_user(user_id: int, db: Session = Depends(get_database_session)):
 def delete_user(user_id: int, db: Session = Depends(get_database_session)):
     user = crud.get_user(db, user_id=user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="Hero not found")
+        raise HTTPException(status_code=404, detail="User not found")
     db.delete(user)
     db.commit()
     return user
@@ -333,7 +347,16 @@ import db.schemas.favouriteSchema as favouriteSchema
 def create_booking(booking: bookingSchema.BookingCreate,
                    db: Session = Depends(get_database_session),
                    current_user: userSchema.User = Depends(get_current_user)):
+    b = crud.get_booking_by_attr(db=db, attribute="user_id", searchVal=current_user.id)
+    if b is not None:
+        raise HTTPException(status_code=401, detail="You cannot create 2 concurrent bookings")
     return crud.create_booking(db=db, booking=booking, user_id=current_user.id)
+
+
+def verify_booking_time(booking_time: datetime):
+    pass
+    # now = datetime.now()
+    # if booking_time.
 
 
 @app.get("/booking/", response_model=list[bookingSchema.Booking])
