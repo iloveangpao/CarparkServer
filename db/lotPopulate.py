@@ -21,6 +21,6 @@ for carpark in cp:
     for i in range(6):
         lot = LotCreate()
         db = get_database_session()
-        create_lot(db, lot, carpark.cp_code)
+        create_lot(db, lot, carpark.cp_code, False)
         db.close()
 

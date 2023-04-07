@@ -103,8 +103,8 @@ def create_user(db: Session, user: UserCreate, hashed_password):
 
 
 # LOTS
-def create_lot(db: Session, lot: LotCreate, cp_code: str):
-    db_lot = model.Lot(**lot.dict(), cp_code=cp_code)
+def create_lot(db: Session, lot: LotCreate, cp_code: str, occupied: bool):
+    db_lot = model.Lot(**lot.dict(), cp_code=cp_code, occupied = occupied)
     db.add(db_lot)
     db.commit()
     db.refresh(db_lot)
