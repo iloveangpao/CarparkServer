@@ -1,6 +1,6 @@
 from sqlalchemy.schema import Column
 from typing import List
-from sqlalchemy.types import String, Integer, Text, JSON, Boolean, ARRAY, PickleType, DateTime, Float
+from sqlalchemy.types import String, Integer, Text, JSON, Boolean, ARRAY, PickleType, DateTime, Float, BOOLEAN
 from sqlalchemy.dialects.mysql import MEDIUMTEXT, VARCHAR
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -44,6 +44,7 @@ class Lot(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     cp_code = Column(String(5), ForeignKey("carparks.cp_code"))
+    occupied = Column(BOOLEAN)
 
     carpark = relationship("Carparks", back_populates="lots")
     bookings = relationship("Booking", back_populates="lot")

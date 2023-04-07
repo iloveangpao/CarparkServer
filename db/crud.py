@@ -110,6 +110,11 @@ def create_lot(db: Session, lot: LotCreate, cp_code: str):
     db.refresh(db_lot)
     return db_lot
 
+def update_lots(db: Session, filter: str, filterVal, toUpdate: str, newVal):
+    db.query(model.Lot).\
+       filter(getattr(model.Lot, filter) == filterVal).\
+       update({toUpdate : newVal})
+    db.commit()
 
 def get_lots(db: Session, skip: int = 0, limit: int = -1):
     if limit > 0:
