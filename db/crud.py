@@ -138,7 +138,7 @@ def get_bookings(db: Session, skip: int = 0, limit: int = 100):
     return db.query(model.Booking).offset(skip).limit(limit).all()
 
 def get_booking_by_attr(db: Session, attribute : str, searchVal):
-    return db.query(model.Booking).filter(getattr(model.Booking,attribute) == searchVal).first()
+    return db.query(model.Booking).filter(getattr(model.Booking, attribute) == searchVal).first()
 
 
 # FAVOURITES

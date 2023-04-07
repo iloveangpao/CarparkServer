@@ -4,6 +4,7 @@ from datetime import datetime
 
 class BookingBase(BaseModel):
     start_time: str # or SQLAlchemy DateTime
+    end_time: str
     lot_id: int
     
 

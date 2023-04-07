@@ -54,6 +54,7 @@ class Booking(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     start_time = Column(String(30), index=True)
+    end_time = Column(String(30), index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     lot_id = Column(Integer, ForeignKey("lots.id"))
 
