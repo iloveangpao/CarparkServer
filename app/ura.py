@@ -14,6 +14,7 @@ class URA:
         self.subject = getType
 
     def getToken(self):
+        print(self.accessKey)
         headers = {
             'AccessKey': self.accessKey,
             'User-Agent': 'curl/7.37.1'
@@ -22,7 +23,7 @@ class URA:
         r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
                          headers=headers, data={}
                          )
-        # print(r.json())
+        print(result)
         result = r.json()['Result']
         # print(r.json()['Result'])
         config().throwData('URA','AccessToken',result)
