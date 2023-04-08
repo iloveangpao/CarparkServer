@@ -6,7 +6,7 @@ services:
     depends_on:
       - database
     volumes:
-      - '/code/'
+      - './code/:/code/'
 
   database:
     hostname: 'host'
