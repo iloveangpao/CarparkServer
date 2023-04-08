@@ -8,8 +8,8 @@ from SVYconverter import SVY21
 
 class URA:
     def __init__(self, getType = None):
-        self.accessKey = config().getData('URA','AccessKey')
-        self.token = self.getToken()
+        self.accessKey = config().getData('URA','accesskey')
+        self.token = config().getData('URA','accesstoken')
         self.subject = getType
 
     def getToken(self):
@@ -25,7 +25,6 @@ class URA:
         result = r.json()['Result']
         # print(r.json()['Result'])
         config().throwData('URA','AccessToken',result)
-        return r.json()['Result']
     
     def getCarparks(self):
         headers = {

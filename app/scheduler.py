@@ -67,5 +67,10 @@ async def add_all_carparks():
     
     print('done')
 
+
+@app.task('daily')
+async def resetToken():
+    URA().getToken()
+    
 if __name__ == "__main__":
     app.run()
