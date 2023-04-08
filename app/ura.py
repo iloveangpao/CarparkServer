@@ -6,6 +6,7 @@ import re
 from dateutil import tz
 from SVYconverter import SVY21
 
+
 class URA:
     def __init__(self, getType = None):
         self.accessKey = config().getData('URA','accesskey')
@@ -212,4 +213,4 @@ class URA:
 
 
 
-print(URA().handleExtraRates(URA().datingCP(URA().getCPFinal())))
+URA().getToken()
