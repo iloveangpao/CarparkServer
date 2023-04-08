@@ -5,6 +5,8 @@ import time
 import re
 from dateutil import tz
 from SVYconverter import SVY21
+import random
+import json
 
 
 class URA:
@@ -13,21 +15,32 @@ class URA:
         self.token = config().getData('URA','accesstoken')
         self.subject = getType
 
-    def getToken(self):
+    def getToken(self, try_number = 1):
         print(self.accessKey)
-        
+
         headers = {
             'AccessKey': self.accessKey,
-            'User-Agent': 'curl/7.37.1'
+            # 'User-Agent': 'curl/7.37.1',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive',
+            'Content-Type': 'application/json'
         }
-        
+        try:
+            response = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action", headers=headers, data = {}).json()
+        except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError):
+            time.sleep(2**try_number + random.random()*0.01) #exponential backoff
+            return self.getToken(try_number=try_number+1)
+        else:
+            return response
         r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
-                         headers=headers, data={}
+                         headers=headers
                          )
-        print(r)
-        result = r.json()['Result']
+        print(r.json())
+        print('\n\n', r.__dict__)
+        # result = r.json()['Result']
         # print(r.json()['Result'])
-        config().throwData('URA','AccessToken',result)
+        # config().throwData('URA','AccessToken',result)
     
     def getCarparks(self):
         headers = {
@@ -215,4 +228,4 @@ class URA:
 
 
 
-URA().getToken()
+# print(URA().getToken())
