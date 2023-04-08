@@ -67,6 +67,26 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan = lifespan)
 
+@app.on_event("startup")
+async def startup_event():
+    masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
+    db = get_database_session()
+    dbList = crud.get_carparks(db)
+    db.close()
+    cpCodeList = []
+    for i in dbList:
+        cpCodeList.append(i.cp_code)
+    toInsert = []
+    for j in masterList:
+        print(j)
+        if j['ppCode'] in cpCodeList:
+            toInsert.append(j)
+    db = get_database_session()
+    crud.create_carpark(db,toInsert)
+    db.close()
+    yield
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
