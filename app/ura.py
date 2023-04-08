@@ -219,18 +219,4 @@ class URA:
         return self.convertToLatLon(cp)
 
 
-# print(URA().getCarparks())
-# import requests
-
-# url = "https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Details"
-
-# payload = ""
-# headers = {
-#   'AccessKey': 'fbc23f75-0023-47f7-a2e7-c22f489cdc75',
-#   'Token': 'sFRZN2403V22PBswT2x7Kf4gbX0ke5ac2D554cM2Qc4Qf7t-T2ckJqd2W-9Mfy0e2y7cYH7Z2c5M0Sj5RX49aDJcjk3Td7Fx4-RQ'
-# }
-
-# response = requests.request("GET", url, headers=headers, data=payload)
-
-# print(response.text)
-
+print(URA().handleExtraRates(URA().datingCP(URA().getCPFinal())))

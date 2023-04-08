@@ -18,15 +18,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import json
-
-app = FastAPI()
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 import os
 from typing import Optional, Annotated
@@ -38,7 +30,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
-
+from app.ura import URA
+from app.onemap import OneMap
+from db.schemas.carparkSchema import *
+import db.crud as crud
+import os, json
+from filter import Filter
 
 model.Base.metadata.create_all(bind=engine)
 
@@ -48,6 +45,31 @@ def get_database_session():
         yield db
     finally:
         db.close()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
+    db = get_database_session()
+    dbList = crud.get_carparks(db)
+    db.close()
+    cpCodeList = []
+    for i in dbList:
+        cpCodeList.append(i.cp_code)
+    toInsert = []
+    for j in masterList:
+        print(j)
+        if j['ppCode'] in cpCodeList:
+            toInsert.append(j)
+    db = get_database_session()
+    crud.create_carpark(db,toInsert)
+    db.close()
+    yield
+
+app = FastAPI(lifespan = lifespan)
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
 
 ###Authentication
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -234,12 +256,7 @@ def delete_user(user_id: int, db: Session = Depends(get_database_session)):
 
 
 #class for accessing URA api
-from app.ura import URA
-from app.onemap import OneMap
-from db.schemas.carparkSchema import *
-import db.crud as crud
-import os, json
-from filter import Filter
+
 
 @app.get("/cpColumns")
 def col(db: Session = Depends(get_database_session)):
@@ -331,10 +348,6 @@ async def get_tasks():
     ]
 
 
-if __name__ == "__main__":
-    app.run()
-    print(os.getcwd())
-
 
 
 
@@ -350,6 +363,7 @@ def create_booking(booking: bookingSchema.BookingCreate,
     b = crud.get_booking_by_attr(db=db, attribute="user_id", searchVal=current_user.id)
     if b is not None:
         raise HTTPException(status_code=401, detail="You cannot create 2 concurrent bookings")
+    crud.update_lots(db,'id',booking.lot_id,'occupied',True)
     return crud.create_booking(db=db, booking=booking, user_id=current_user.id)
 
 
@@ -415,3 +429,8 @@ def read_lots(skip: int = 0, limit: int = 100, db: Session = Depends(get_databas
 #     lot = crud.get_lots(db, skip=skip, limit=limit)
 #     return lot
 
+
+
+if __name__ == "__main__":
+    app.run()
+    print(os.getcwd())

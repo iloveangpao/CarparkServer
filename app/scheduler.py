@@ -21,23 +21,6 @@ def get_database_session():
     finally:
         db.close()
 
-
-masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
-db = get_database_session()
-dbList = crud.get_carparks(db)
-db.close()
-cpCodeList = []
-for i in dbList:
-    cpCodeList.append(i.cp_code)
-toInsert = []
-for j in masterList:
-    print(j)
-    if j['ppCode'] in cpCodeList:
-        toInsert.append(j)
-db = get_database_session()
-crud.create_carpark(db,toInsert)
-db.close()
-
 app = Rocketry(execution="async")
 
 @app.task('every 15 seconds')
@@ -71,6 +54,6 @@ async def add_all_carparks():
 @app.task('daily')
 async def resetToken():
     URA().getToken()
-    
+
 if __name__ == "__main__":
     app.run()
