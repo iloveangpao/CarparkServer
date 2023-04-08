@@ -7,6 +7,7 @@ from dateutil import tz
 from SVYconverter import SVY21
 import random
 import json
+import http.client
 
 
 class URA:
@@ -14,57 +15,49 @@ class URA:
         self.accessKey = config().getData('URA','accesskey')
         self.token = config().getData('URA','accesstoken')
         self.subject = getType
+        self.conn = http.client.HTTPSConnection("www.ura.gov.sg")
 
-    def getToken(self, try_number = 1):
-        print(self.accessKey)
-
+    def makeRequest(self, getSet, url, payload, headers):
+        self.conn.request(getSet, url, payload, headers)
+        res = self.conn.getresponse()
+        data = res.read().decode('utf8')
+        dataJson = json.loads(data)
+        return dataJson
+    
+    def getToken(self):
+        payload = ''
         headers = {
-            'AccessKey': self.accessKey,
-            # 'User-Agent': 'curl/7.37.1',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive',
-            'Content-Type': 'application/json'
+        'AccessKey': self.accessKey
         }
-        try:
-            response = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action", headers=headers, data = {}).json()
-        except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError):
-            time.sleep(2**try_number + random.random()*0.01) #exponential backoff
-            return self.getToken(try_number=try_number+1)
-        else:
-            return response
-        r = requests.get("https://www.ura.gov.sg/uraDataService/insertNewToken.action",
-                         headers=headers
-                         )
-        print(r.json())
-        print('\n\n', r.__dict__)
-        # result = r.json()['Result']
-        # print(r.json()['Result'])
-        # config().throwData('URA','AccessToken',result)
+        result = self.makeRequest("GET", "/uraDataService/insertNewToken.action", payload, headers)
+        config().throwData('URA','AccessToken',result['Result'])
     
     def getCarparks(self):
+        print(self.accessKey,self.token)
+        payload = ''
         headers = {
             'AccessKey': self.accessKey,
             'User-Agent': 'curl/7.37.1',
             'Token': self.token
         }
-        
-        r = requests.get("https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Details",
-                         headers=headers, data={}
-                         )
-        return r.json()['Result']
+        try:
+            result = self.makeRequest("GET", "/uraDataService/invokeUraDS?service=Car_Park_Details", payload, headers)['Result']
+        except:
+            result = json.loads(config().getData('URA','carparks'))
+        return result
     
     def getAvail(self):
+        payload = ''
         headers = {
             'AccessKey': self.accessKey,
             'User-Agent': 'curl/7.37.1',
             'Token': self.token
         }
-        
-        r = requests.get("https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Availability",
-                         headers=headers, data={}
-                         )
-        return r.json()['Result']
+        try:
+            result = self.makeRequest("GET", "/uraDataService/invokeUraDS?service=Car_Park_Availability", payload, headers)['Result']
+        except:
+            result = json.loads(config().getData('URA','avail'))
+        return result
 
     def datingCP(self,cp = None):
         now = datetime.datetime.now()
@@ -226,6 +219,18 @@ class URA:
         return self.convertToLatLon(cp)
 
 
+# print(URA().getCarparks())
+# import requests
 
+# url = "https://www.ura.gov.sg/uraDataService/invokeUraDS?service=Car_Park_Details"
 
-# print(URA().getToken())
+# payload = ""
+# headers = {
+#   'AccessKey': 'fbc23f75-0023-47f7-a2e7-c22f489cdc75',
+#   'Token': 'sFRZN2403V22PBswT2x7Kf4gbX0ke5ac2D554cM2Qc4Qf7t-T2ckJqd2W-9Mfy0e2y7cYH7Z2c5M0Sj5RX49aDJcjk3Td7Fx4-RQ'
+# }
+
+# response = requests.request("GET", url, headers=headers, data=payload)
+
+# print(response.text)
+
