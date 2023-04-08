@@ -79,7 +79,7 @@ async def startup_event():
     toInsert = []
     for j in masterList:
         print(j)
-        if j['ppCode'] in cpCodeList:
+        if j['ppCode'] not in cpCodeList:
             toInsert.append(j)
     db = get_database_session()
     crud.create_carpark(db,toInsert)
