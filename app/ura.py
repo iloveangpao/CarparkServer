@@ -219,4 +219,4 @@ class URA:
         return self.convertToLatLon(cp)
 
 
-print(URA().handleExtraRates(URA().datingCP(URA().getCPFinal())))
+# print(URA().handleExtraRates(URA().datingCP(URA().getCPFinal())))

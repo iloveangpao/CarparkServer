@@ -20,7 +20,22 @@ def get_database_session():
         return db
     finally:
         db.close()
-
+print('in')
+masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
+db = get_database_session()
+dbList = crud.get_carparks(db)
+db.close()
+cpCodeList = []
+for i in dbList:
+    cpCodeList.append(i.cp_code)
+toInsert = []
+for j in masterList:
+    print(j)
+    if j['ppCode'] not in cpCodeList:
+        toInsert.append(j)
+db = get_database_session()
+crud.create_carpark(db,toInsert)
+db.close()
 app = Rocketry(execution="async")
 
 @app.task('every 15 seconds')

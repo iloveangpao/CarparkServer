@@ -69,6 +69,7 @@ app = FastAPI(lifespan = lifespan)
 
 @app.on_event("startup")
 async def startup_event():
+    print('in')
     masterList = URA().handleExtraRates(URA().datingCP(URA().getCPFinal()))
     db = get_database_session()
     dbList = crud.get_carparks(db)
