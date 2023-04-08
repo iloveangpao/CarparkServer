@@ -299,9 +299,9 @@ def read_carparks(skip: int = 0, limit: int = -1, db: Session = Depends(get_data
     return carparks
 
 @app.get('/carparkByCode/{code}', response_model=Carpark)
-def read_exact_carpark(skip: int = 0, limit: int = -1, db: Session = Depends(get_database_session, code):
+def read_exact_carpark(db: Session = Depends(get_database_session, code)):
     return crud.get_carpark_by_code(db,code)
-    
+
 @app.get("/avail/")
 async def getAvailCP():
     return URA().getAvailFinal()
