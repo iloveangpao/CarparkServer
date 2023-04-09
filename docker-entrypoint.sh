@@ -6,6 +6,7 @@ until nc -vz host:3306 > /dev/null; do
   done
   >&2 echo "host:3306 is up"
 
+pwd
 python ./app/main.py
 
 exit 0
