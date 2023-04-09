@@ -4,10 +4,12 @@ import alembic
 from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
 import logging
-
+import os
 # we're appending the app directory to our path here so that we can import config easily
 
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[3]))
+sys.path.append('/code/')
+print(sys.path)
 from db.database import DATABASE_URL  # noqa
 
 # Alembic Config object, which provides access to values within the .ini file

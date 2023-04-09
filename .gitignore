@@ -1,3 +1,8 @@
 /__pycache__
 /my-db
 /app/test.py
+app/__pycache__/
+db/__pycache__/
+db/migrations/__pycache__/
+db/migrations/versions/__pycache__/
+db/schemas/__pycache__/

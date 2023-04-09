@@ -404,9 +404,19 @@ def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_dat
     return booking
 
 
-@app.get("/booking/me/", response_model=list[bookingSchema.Booking])
-async def read_bookings_me(current_user: userSchema.User = Depends(get_current_user)):
-    return current_user.bookings
+@app.get("/booking/me/")
+async def read_bookings_me(current_user: userSchema.User = Depends(get_current_user), db: Session = Depends(get_database_session)):
+    bookings = current_user.bookings
+    bookingList = []
+    for booking in bookings:
+        lotID = booking.lot_id
+        lot : lotSchema.Lot = crud.get_lot_by_attr(db,'id',lotID)
+        cp_code = lot.cp_code
+        cp : Carpark = crud.get_carpark_by_code(db, cp_code)
+        bookingInfo = {'booking': booking.__dict__, 'carpark': cp.__dict__}
+        bookingList.append(bookingInfo)
+    return bookingList
+
 
 
 

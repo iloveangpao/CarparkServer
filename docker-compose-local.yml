@@ -1,12 +1,16 @@
 services:
   api-server:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "80:8000"
     depends_on:
       - database
-    # volumes:
-    #   - './code/:/code/'
+    volumes:
+      - './app:/code/app'
+      - './db:/code/db'
+    command: ./docker-entrypoint.sh
 
   database:
     hostname: 'host'
