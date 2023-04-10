@@ -7,7 +7,7 @@ until nc -vz host:3306 > /dev/null; do
   >&2 echo "host:3306 is up"
 
 pwd
-ls
+ls app
 python app/main.py
 
 exit 0
