@@ -19,7 +19,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 import json
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 from typing import Optional, Annotated
 print(os.listdir())
@@ -387,15 +387,35 @@ def create_booking(booking: bookingSchema.BookingCreate,
                    current_user: userSchema.User = Depends(get_current_user)):
     b = crud.get_booking_by_attr(db=db, attribute="user_id", searchVal=current_user.id)
     if b is not None:
-        raise HTTPException(status_code=401, detail="You cannot create 2 concurrent bookings")
+        raise HTTPException(status_code=400, detail="You cannot create 2 concurrent bookings")
+    if not verify_booking_time(start_time=booking.start_time, end_time=booking.end_time):
+        raise HTTPException(status_code=400, detail='The selected times are not valid')
     crud.update_lots(db,'id',booking.lot_id,'occupied',True)
     return crud.create_booking(db=db, booking=booking, user_id=current_user.id)
 
 
-def verify_booking_time(booking_time: datetime):
-    pass
-    # now = datetime.now()
-    # if booking_time.
+def verify_booking_time(start_time: str, end_time: str) -> bool:
+    # CONSTANTS
+    max_dist_to_start: timedelta = timedelta(hours=2)
+    max_dist_to_end: timedelta = timedelta(hours=10)
+
+    now = datetime.now() + timedelta(hours=8)
+    start: datetime = time_str_to_datetime(start_time)
+    #end: datetime = time_str_to_datetime(end_time)
+    start_diff: timedelta = start - now
+    #end_diff: timedelta = end - now
+    #print(now, start, start_diff, end, end_diff)
+    if start_diff > max_dist_to_start:# or end_diff > max_dist_to_end:
+        return False
+    return True
+
+
+def time_str_to_datetime(time_str: str) -> datetime:
+    # EXAMPLE STRING: 2023-04-08T12:35:00.000
+    time_datetime: datetime = datetime(year=int(time_str[0:4]), month=int(time_str[5:7]),
+                 day=int(time_str[8:10]), hour=int(time_str[11:13]),
+                 minute=int(time_str[14:16]))
+    return time_datetime
 
 
 @app.get("/booking/", response_model=list[bookingSchema.Booking])
@@ -418,8 +438,16 @@ async def read_bookings_me(current_user: userSchema.User = Depends(get_current_u
     return bookingList
 
 
-
-
+@app.delete("/booking/{booking_id}", response_model=bookingSchema.Booking)
+def delete_booking(booking_id: int, db: Session = Depends(get_database_session), 
+                current_user: userSchema.User = Depends(get_current_user)):
+    booking = crud.get_booking_by_attr(db, attribute='id', searchVal=booking_id)
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    crud.update_lots(db,'id',booking.lot_id,'occupied', False)
+    db.delete(booking)
+    db.commit()
+    return booking
 
 
 
@@ -443,14 +471,22 @@ async def read_favourite_me(current_user: userSchema.User = Depends(get_current_
     return current_user.favourites
 
 
-
+@app.delete("/favourite/{favourite_id}", response_model=favouriteSchema.Favourite)
+def delete_favourite(favourite_id: int, db: Session = Depends(get_database_session), 
+                current_user: userSchema.User = Depends(get_current_user)):
+    favourite = crud.get_favourites_by_attr(db, attribute='id', searchVal=favourite_id)
+    if not favourite:
+        raise HTTPException(status_code=404, detail="Favourite not found")
+    db.delete(favourite)
+    db.commit()
+    return favourite
 
 
 
 # Lot endpoints
 @app.post("/lot/", response_model=lotSchema.Lot)
 def create_lot(cp_code: str, lot: lotSchema.LotCreate, db: Session = Depends(get_database_session)):
-    return crud.create_lot(db=db, lot=lot, cp_code=cp_code)
+    return crud.create_lot(db=db, lot=lot, cp_code=cp_code, occupied=False)
 
 
 @app.get("/lot/", response_model=list[lotSchema.Lot])
