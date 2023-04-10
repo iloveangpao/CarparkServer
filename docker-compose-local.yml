@@ -7,9 +7,6 @@ services:
       - "80:8000"
     depends_on:
       - database
-    volumes:
-      - './app:/code/app'
-      - './db:/code/db'
     command: ./docker-entrypoint.sh
 
   database:
