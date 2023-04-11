@@ -21,7 +21,7 @@ class Filter():
             else:
                 temp['toSort'] = temp[toSort]
             result.append(temp)
-        
+        #
         self.quickSort(result, 0, size - 1)
         if reverse:
             result.reverse()
