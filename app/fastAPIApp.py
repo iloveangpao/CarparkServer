@@ -390,7 +390,10 @@ def create_booking(booking: bookingSchema.BookingCreate,
         raise HTTPException(status_code=400, detail="You cannot create 2 concurrent bookings")
     if not verify_booking_time(start_time=booking.start_time, end_time=booking.end_time):
         raise HTTPException(status_code=400, detail='The selected times are not valid')
-    crud.update_lots(db,'id',booking.lot_id,'occupied',True)
+    crud.update_lots(db,'id', booking.lot_id,'occupied',True)
+    availability = crud.get_carpark_by_code(db, crud.get_lot_by_attr(db, 'id', booking.lot_id).cp_code).Availability
+    crud.update_carpark(db, 'cp_code', crud.get_lot_by_attr(db, 'id', booking.lot_id).cp_code,
+                        'Availability', availability - 1)
     return crud.create_booking(db=db, booking=booking, user_id=current_user.id)
 
 
@@ -445,6 +448,9 @@ def delete_booking(booking_id: int, db: Session = Depends(get_database_session),
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     crud.update_lots(db,'id',booking.lot_id,'occupied', False)
+    availability = crud.get_carpark_by_code(db, crud.get_lot_by_attr(db, 'id', booking.lot_id).cp_code).Availability
+    crud.update_carpark(db, 'cp_code', crud.get_lot_by_attr(db, 'id', booking.lot_id).cp_code,
+                        'Availability', availability + 1)
     db.delete(booking)
     db.commit()
     return booking
@@ -456,6 +462,10 @@ def delete_booking(booking_id: int, db: Session = Depends(get_database_session),
 def create_favourite(cp_code: str, favourite: favouriteSchema.FavouriteCreate,
                      db: Session = Depends(get_database_session),
                      current_user: userSchema.User = Depends(get_current_user)):
+    favs = current_user.favourites
+    for fav in favs:
+        if fav.cp_code == cp_code:
+            raise HTTPException(status_code=400, detail="You have already add this carpark to your favourites")
     return crud.create_favourite(db=db, favourite=favourite, 
                                  user_id=current_user.id, cp_code=cp_code)
 

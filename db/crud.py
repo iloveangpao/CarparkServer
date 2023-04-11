@@ -39,7 +39,7 @@ def get_carparks(db: Session, skip: int = 0, limit: int = -1):
     
     return carparkList
 
-def get_carpark_by_code(db: Session, cp_code: str):
+def get_carpark_by_code(db: Session, cp_code: str) -> Carpark:
     return db.query(model.Carparks).filter(model.Carparks.cp_code == cp_code).first()
 
 def update_carpark(db: Session, filter: str, filterVal, toUpdate: str, newVal):
