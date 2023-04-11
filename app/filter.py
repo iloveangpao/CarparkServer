@@ -29,7 +29,7 @@ class Filter():
         return result
 
     def getNearby(self, data: list[Carpark], base: list):
-        QUOTA = 0.5
+        QUOTA = 1.0
         withinFiveMin = []
         convBase = SVY21().computeLatLon(float(base[0]),float(base[1]))
         for i in data:
@@ -42,7 +42,7 @@ class Filter():
                 # print(timeTaken)
                 # i['total_time'] = timeTaken/60
                 print(GD(convBase,tempXY))
-                if GD(convBase,tempXY) <=  0.5:
+                if GD(convBase,tempXY) <= QUOTA:
                     withinFiveMin.append(i)
             except Exception as e:
                 print(e)
