@@ -233,14 +233,14 @@ def create_user(user: userSchema.UserCreate, db: Session = Depends(get_database_
         raise HTTPException(status_code=400, detail="Password too short")
     if len(user.password) > 20:
         raise HTTPException(status_code=400, detail="Password too long")
-    # if user.password.upper() == user.password:
-    #     raise HTTPException(status_code=400, detail="Password must include lowercase letters")
-    # if user.password.lower() == user.password:
-    #     raise HTTPException(status_code=400, detail="Password must include uppercase letters")
+    if user.password.upper() == user.password:
+        raise HTTPException(status_code=400, detail="Password must include lowercase letters")
+    if user.password.lower() == user.password:
+        raise HTTPException(status_code=400, detail="Password must include uppercase letters")
     # if user.password.isalnum():
     #     raise HTTPException(status_code=400, detail="Password must have symbols")
-    # if user.password.isalpha():
-    #     raise HTTPException(status_code=400, detail="Password must have numbers")
+    if user.password.isalpha():
+        raise HTTPException(status_code=400, detail="Password must have numbers")
     if not user.password:
         raise HTTPException(status_code=400, detail="Please key in a password")
 
@@ -404,11 +404,11 @@ def verify_booking_time(start_time: str, end_time: str) -> bool:
 
     now = datetime.now() + timedelta(hours=8)
     start: datetime = time_str_to_datetime(start_time)
-    #end: datetime = time_str_to_datetime(end_time)
+    end: datetime = time_str_to_datetime(end_time)
     start_diff: timedelta = start - now
-    #end_diff: timedelta = end - now
-    #print(now, start, start_diff, end, end_diff)
-    if start_diff > max_dist_to_start:# or end_diff > max_dist_to_end:
+    end_diff: timedelta = end - now
+    # print(now, start, start_diff, end, end_diff)
+    if start_diff > max_dist_to_start or end_diff > max_dist_to_end:
         return False
     return True
 
