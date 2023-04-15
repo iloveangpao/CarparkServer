@@ -399,7 +399,7 @@ def create_booking(booking: bookingSchema.BookingCreate,
 
 def verify_booking_time(start_time: str, end_time: str) -> bool:
     # CONSTANTS
-    max_dist_to_start: timedelta = timedelta(hours=2)
+    min_dist_to_start: timedelta = timedelta(hours=2)
     max_dist_to_end: timedelta = timedelta(hours=10)
 
     now = datetime.now() + timedelta(hours=8)
@@ -408,7 +408,7 @@ def verify_booking_time(start_time: str, end_time: str) -> bool:
     start_diff: timedelta = start - now
     end_diff: timedelta = end - now
     # print(now, start, start_diff, end, end_diff)
-    if start_diff > max_dist_to_start or end_diff > max_dist_to_end:
+    if start_diff < min_dist_to_start or end_diff > max_dist_to_end:
         return False
     return True
 
