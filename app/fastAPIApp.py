@@ -408,7 +408,7 @@ def verify_booking_time(start_time: str, end_time: str) -> bool:
     start_diff: timedelta = start - now
     end_diff: timedelta = end - now
     # print(now, start, start_diff, end, end_diff)
-    if start_diff < max_dist_to_start or end_diff > max_dist_to_end or end - start < timedelta():
+    if start_diff > max_dist_to_start or end_diff > max_dist_to_end or end - start < timedelta() or start_diff < timedelta():
         return False
     return True
 
